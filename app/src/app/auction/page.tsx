@@ -6,16 +6,33 @@ import { formatKRW } from '@/lib/utils/cn';
 import { GlassCard, Badge, SectionHeader } from '@/components/ui/Glass';
 import AutoBanner from '@/components/common/AutoBanner';
 import PropertyDetailModal, { type DetailItem } from '@/components/map/PropertyDetailModal';
-import type { AuctionAnalysis } from '@/types/auction';
-import { Upload, Sparkles, AlertTriangle, FileText, BookOpen, Eye, MapPin } from 'lucide-react';
+import CaseReport from '@/components/auction/CaseReport';
+import type { AuctionAnalysis, AuctionCaseReport } from '@/types/auction';
+import { Upload, Sparkles, AlertTriangle, FileText, BookOpen, Eye, MapPin, Hash, Loader2 } from 'lucide-react';
 
 export default function AuctionPage() {
+  const [mode, setMode] = useState<'pdf' | 'case'>('pdf');
   const [file, setFile] = useState<File | null>(null);
   const [model, setModel] = useState<'fast' | 'balanced' | 'smart'>('balanced');
   const [analysis, setAnalysis] = useState<AuctionAnalysis | null>(null);
+  const [caseReport, setCaseReport] = useState<AuctionCaseReport | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [detailItem, setDetailItem] = useState<DetailItem | null>(null);
+
+  // 사건번호 모드 입력 상태
+  const [caseInput, setCaseInput] = useState({
+    caseNumber: '2024타경2542',
+    court: '서울동부지방법원',
+    address: '서울특별시 광진구 광장동 372-11',
+    appraisalPrice: 253228000,
+    minimumBidPrice: 66382000,
+    bidDate: '2026.04.27',
+    areaM2: 370,
+    zoning: '제1종일반주거지역',
+    propertyType: '임야',
+    notes: '맹지, 자연경관지구, 사고지(2017.07.27)',
+  });
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: { 'application/pdf': ['.pdf'] },
@@ -53,6 +70,26 @@ export default function AuctionPage() {
     }
   }
 
+  async function analyzeCase() {
+    setLoading(true);
+    setError(null);
+    setCaseReport(null);
+    try {
+      const res = await fetch('/api/auction/case-analysis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(caseInput),
+      });
+      if (!res.ok) throw new Error((await res.json()).error ?? 'API 오류');
+      const json = await res.json();
+      setCaseReport(json.report);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '오류');
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
       <SectionHeader
@@ -63,7 +100,124 @@ export default function AuctionPage() {
 
       <AutoBanner required={['anthropic']} />
 
-      <div
+      {/* 모드 전환 */}
+      <div className="flex gap-1 rounded-xl glass p-1 w-fit">
+        {(
+          [
+            { v: 'pdf', icon: <Upload className="size-4" />, label: 'PDF 업로드 (지지옥션 등)' },
+            { v: 'case', icon: <Hash className="size-4" />, label: '사건번호 입력 (자동 종합)' },
+          ] as const
+        ).map((t) => (
+          <button
+            key={t.v}
+            onClick={() => setMode(t.v as 'pdf' | 'case')}
+            className={`flex items-center gap-2 px-4 py-2 text-sm rounded-lg transition ${
+              mode === t.v
+                ? 'bg-white/10 text-white'
+                : 'text-[color:var(--text-muted)] hover:text-white'
+            }`}
+          >
+            {t.icon}
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {mode === 'case' && (
+        <GlassCard>
+          <h3 className="font-semibold mb-3 text-sm">사건번호 + 매물 정보 입력</h3>
+          <div className="grid md:grid-cols-2 gap-3 text-xs">
+            <CaseField
+              label="사건번호 *"
+              value={caseInput.caseNumber}
+              onChange={(v) => setCaseInput({ ...caseInput, caseNumber: v })}
+              placeholder="2024타경2542"
+            />
+            <CaseField
+              label="관할 법원"
+              value={caseInput.court}
+              onChange={(v) => setCaseInput({ ...caseInput, court: v })}
+            />
+            <div className="md:col-span-2">
+              <CaseField
+                label="소재지 *"
+                value={caseInput.address}
+                onChange={(v) => setCaseInput({ ...caseInput, address: v })}
+              />
+            </div>
+            <CaseFieldNum
+              label="감정가 (원)"
+              value={caseInput.appraisalPrice}
+              onChange={(v) => setCaseInput({ ...caseInput, appraisalPrice: v })}
+            />
+            <CaseFieldNum
+              label="최저가 (원)"
+              value={caseInput.minimumBidPrice}
+              onChange={(v) => setCaseInput({ ...caseInput, minimumBidPrice: v })}
+            />
+            <CaseField
+              label="입찰일"
+              value={caseInput.bidDate}
+              onChange={(v) => setCaseInput({ ...caseInput, bidDate: v })}
+              placeholder="2026.04.27"
+            />
+            <CaseFieldNum
+              label="면적 (㎡)"
+              value={caseInput.areaM2}
+              onChange={(v) => setCaseInput({ ...caseInput, areaM2: v })}
+            />
+            <CaseField
+              label="용도지역"
+              value={caseInput.zoning}
+              onChange={(v) => setCaseInput({ ...caseInput, zoning: v })}
+            />
+            <CaseField
+              label="물건 종류"
+              value={caseInput.propertyType}
+              onChange={(v) => setCaseInput({ ...caseInput, propertyType: v })}
+              placeholder="임야 / 아파트 / 상가 / 토지 등"
+            />
+            <div className="md:col-span-2">
+              <label className="text-[color:var(--text-muted)] uppercase tracking-wider">
+                특이사항·메모 (선택)
+              </label>
+              <textarea
+                value={caseInput.notes}
+                onChange={(e) => setCaseInput({ ...caseInput, notes: e.target.value })}
+                rows={2}
+                placeholder="맹지·사고지·자연경관지구·점유자 등"
+                className="mt-1 w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-[color:var(--accent)]/40"
+              />
+            </div>
+          </div>
+          <div className="mt-4 flex items-center gap-3">
+            <button
+              onClick={analyzeCase}
+              disabled={loading || !caseInput.caseNumber || !caseInput.address}
+              className="inline-flex items-center gap-2 rounded-xl bg-[color:var(--accent)] text-black px-5 py-2.5 text-sm font-semibold disabled:opacity-50 accent-glow"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="size-4 animate-spin" />
+                  종합 분석 중… (60초)
+                </>
+              ) : (
+                <>
+                  <Sparkles className="size-4" />
+                  종합 보고서 생성
+                </>
+              )}
+            </button>
+            <span className="text-xs text-[color:var(--text-muted)]">
+              Claude Sonnet 4.6 — 8개 섹션 (권리·시세·도시계획·시나리오·체크리스트)
+            </span>
+          </div>
+        </GlassCard>
+      )}
+
+      {mode === 'case' && caseReport && <CaseReport report={caseReport} />}
+
+      {mode === 'pdf' && (<div
         {...getRootProps()}
         className={`relative overflow-hidden rounded-3xl p-12 text-center cursor-pointer transition border-2 border-dashed ${
           isDragActive
@@ -97,9 +251,9 @@ export default function AuctionPage() {
             </p>
           </div>
         )}
-      </div>
+      </div>)}
 
-      <div className="flex flex-wrap items-center gap-3">
+      {mode === 'pdf' && (<div className="flex flex-wrap items-center gap-3">
         <div className="flex gap-1 rounded-xl bg-white/5 border border-white/10 p-1">
           {(['fast', 'balanced', 'smart'] as const).map((m) => (
             <button
@@ -123,7 +277,7 @@ export default function AuctionPage() {
           <Sparkles className="size-4" />
           {loading ? '분석 중… (30~60초)' : '권리분석 시작'}
         </button>
-      </div>
+      </div>)}
 
       {error && (
         <GlassCard className="border-red-500/30 bg-red-500/5 text-red-300 text-sm">
@@ -131,7 +285,7 @@ export default function AuctionPage() {
         </GlassCard>
       )}
 
-      {analysis && (
+      {mode === 'pdf' && analysis && (
         <div className="space-y-4">
           {/* PDF에서 추출한 매물 식별 정보 + 인근 실거래가 자동 조회 트리거 */}
           {analysis.caseSummary?.address && (
@@ -303,6 +457,51 @@ export default function AuctionPage() {
       )}
 
       <PropertyDetailModal item={detailItem} onClose={() => setDetailItem(null)} />
+    </div>
+  );
+}
+
+function CaseField({
+  label,
+  value,
+  onChange,
+  placeholder,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+}) {
+  return (
+    <div>
+      <label className="text-[color:var(--text-muted)] uppercase tracking-wider">{label}</label>
+      <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="mt-1 w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-[color:var(--accent)]/40"
+      />
+    </div>
+  );
+}
+function CaseFieldNum({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: number;
+  onChange: (v: number) => void;
+}) {
+  return (
+    <div>
+      <label className="text-[color:var(--text-muted)] uppercase tracking-wider">{label}</label>
+      <input
+        type="number"
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value) || 0)}
+        className="mt-1 w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm tabular-nums focus:outline-none focus:border-[color:var(--accent)]/40"
+      />
     </div>
   );
 }
