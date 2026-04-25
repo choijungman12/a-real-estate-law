@@ -111,7 +111,7 @@ export default function PropertyDetailModal({
         </button>
 
         <div className="flex items-start gap-3 mb-4">
-          <div className="grid place-items-center size-10 rounded-xl bg-gradient-to-br from-[color:var(--accent)] to-emerald-400 text-black">
+          <div className="grid place-items-center size-10 rounded-xl bg-gradient-to-br from-[color:var(--accent)] to-[color:var(--warm)] text-white">
             <MapPin className="size-5" />
           </div>
           <div className="flex-1 min-w-0">

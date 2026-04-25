@@ -19,35 +19,43 @@ export default function HomePage() {
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-3xl glass-strong p-8 md:p-10 min-h-[420px]">
-        <div className="absolute -top-20 -right-20 size-72 rounded-full bg-[color:var(--accent)]/20 blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-32 -left-10 size-72 rounded-full bg-violet-500/15 blur-3xl pointer-events-none" />
-        <Skyline className="absolute inset-x-0 bottom-0 w-full opacity-80 pointer-events-none" />
+      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white via-white to-[color:var(--accent-soft)] border border-[color:var(--border-subtle)] p-8 md:p-12 min-h-[440px] shadow-sm">
+        <div className="absolute -top-32 -right-32 size-96 rounded-full bg-[color:var(--accent-soft)] blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-40 -left-20 size-80 rounded-full bg-[color:var(--warm-soft)] blur-3xl pointer-events-none" />
+        <Skyline className="absolute inset-x-0 bottom-0 w-full opacity-25 pointer-events-none" />
 
         <div className="relative">
-          <Badge tone="accent">REAL ESTATE × AI</Badge>
-          <h1 className="mt-3 text-3xl md:text-5xl font-semibold tracking-tight">
+          <span className="inline-flex items-center gap-2 rounded-full bg-[color:var(--accent)] text-white px-3 py-1 text-[10px] font-bold uppercase tracking-wider">
+            REAL ESTATE × AI
+          </span>
+          <h1 className="mt-4 text-3xl md:text-5xl font-bold tracking-tight text-[color:var(--text-primary)] leading-tight">
             한국 부동산 모든 데이터,
             <br />
             <span className="text-[color:var(--accent)]">한 화면에서.</span>
           </h1>
-          <p className="mt-4 text-[color:var(--text-secondary)] max-w-xl text-sm md:text-base">
-            공식 OPEN API 11종 + 14개 주제 법령 + 지지옥션 PDF AI 권리분석.
-            경매·공매·실거래가·청약·분양·법령·뉴스를 자체 분석으로 통합합니다.
+          <p className="mt-5 text-[color:var(--text-secondary)] max-w-xl text-sm md:text-base leading-relaxed">
+            공식 OPEN API 11종 + 14개 주제 법령 + AI 권리분석.
+            경매·공매·실거래가·청약·분양·법령·뉴스·재개발 수지분석을 통합합니다.
           </p>
-          <div className="mt-6 flex flex-wrap gap-3">
+          <div className="mt-7 flex flex-wrap gap-3">
             <a
               href={withBase('/auction')}
-              className="group inline-flex items-center gap-2 rounded-xl bg-[color:var(--accent)] text-black px-5 py-3 text-sm font-semibold accent-glow"
+              className="group inline-flex items-center gap-2 rounded-xl bg-[color:var(--accent)] text-white px-6 py-3 text-sm font-bold shadow-lg shadow-[color:var(--accent-glow)] hover:bg-[color:var(--accent-hover)] transition"
             >
-              <Sparkles className="size-4" /> 경매 권리분석 시작
+              <Sparkles className="size-4" /> 사건번호로 권리분석 시작
               <ArrowUpRight className="size-4 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </a>
             <a
               href={withBase('/realestate')}
-              className="inline-flex items-center gap-2 rounded-xl bg-white/5 border border-white/10 px-5 py-3 text-sm text-white hover:bg-white/10"
+              className="inline-flex items-center gap-2 rounded-xl bg-white border border-[color:var(--border-strong)] px-6 py-3 text-sm font-semibold text-[color:var(--text-primary)] hover:bg-[color:var(--surface-hover)]"
             >
               실거래가 검색
+            </a>
+            <a
+              href={withBase('/map')}
+              className="inline-flex items-center gap-2 rounded-xl bg-[color:var(--warm)] text-white px-6 py-3 text-sm font-bold hover:opacity-90"
+            >
+              GIS 지도 열기
             </a>
           </div>
         </div>

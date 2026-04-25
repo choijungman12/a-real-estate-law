@@ -41,13 +41,13 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden md:flex md:w-60 lg:w-64 shrink-0 flex-col border-r border-white/5 bg-black/20 backdrop-blur-xl">
-      <div className="px-5 py-5 flex items-center gap-2">
-        <div className="grid place-items-center size-8 rounded-lg bg-gradient-to-br from-[color:var(--accent)] to-emerald-400 text-black font-bold">
+    <aside className="hidden md:flex md:w-60 lg:w-64 shrink-0 flex-col border-r border-[color:var(--border-subtle)] bg-white">
+      <div className="px-5 py-5 flex items-center gap-2.5">
+        <div className="grid place-items-center size-9 rounded-xl bg-[color:var(--accent)] text-white font-bold text-base shadow-md shadow-[color:var(--accent-glow)]">
           R
         </div>
         <div>
-          <div className="font-semibold leading-none">REAL ESTATE</div>
+          <div className="font-bold leading-none text-[color:var(--text-primary)]">REAL ESTATE</div>
           <div className="text-[10px] uppercase tracking-widest text-[color:var(--text-muted)] mt-1">
             AI · LAW · MARKET
           </div>
@@ -65,10 +65,10 @@ export default function Sidebar() {
               key={item.href}
               href={withBase(item.href)}
               className={cn(
-                'group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition',
+                'group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition border',
                 active
-                  ? 'bg-white/8 text-white border border-white/10'
-                  : 'text-[color:var(--text-secondary)] hover:bg-white/5 hover:text-white border border-transparent'
+                  ? 'bg-[color:var(--accent-soft)] text-[color:var(--accent)] border-[color:var(--accent-soft)] font-semibold'
+                  : 'text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-hover)] hover:text-[color:var(--text-primary)] border-transparent'
               )}
             >
               <Icon
@@ -76,12 +76,12 @@ export default function Sidebar() {
                   'size-4 shrink-0 transition',
                   active
                     ? 'text-[color:var(--accent)]'
-                    : 'text-[color:var(--text-muted)] group-hover:text-white'
+                    : 'text-[color:var(--text-muted)] group-hover:text-[color:var(--text-primary)]'
                 )}
               />
               <span className="flex-1">{item.label}</span>
               {item.accent && (
-                <span className="text-[9px] font-bold text-[color:var(--accent)] bg-[color:var(--accent-soft)] px-1.5 py-0.5 rounded">
+                <span className="text-[9px] font-bold text-white bg-[color:var(--warm)] px-1.5 py-0.5 rounded">
                   AI
                 </span>
               )}
@@ -90,22 +90,22 @@ export default function Sidebar() {
         })}
       </nav>
 
-      <div className="px-3 py-3 border-t border-white/5">
+      <div className="px-3 py-3 border-t border-[color:var(--border-subtle)]">
         <a
           href={withBase('/settings')}
-          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-[color:var(--text-secondary)] hover:bg-white/5 hover:text-white transition"
+          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-hover)] transition"
         >
           <Settings className="size-4" />
           <span>설정·API 키</span>
         </a>
-        <div className="mt-3 px-3 py-2 rounded-xl bg-[color:var(--accent-soft)] border border-[color:var(--accent-soft)]">
-          <div className="text-[10px] uppercase tracking-wider text-[color:var(--accent)]">
+        <div className="mt-3 px-3 py-2.5 rounded-xl bg-[color:var(--accent-soft)] border border-[color:var(--accent-soft)]">
+          <div className="text-[10px] uppercase tracking-wider text-[color:var(--accent)] font-bold">
             국가법령정보 API
           </div>
-          <div className="mt-1 text-xs text-white">
+          <div className="mt-1 text-xs text-[color:var(--text-primary)] font-medium">
             OC: <span className="font-mono">realestate_ai_01</span>
           </div>
-          <div className="text-[10px] text-[color:var(--text-muted)] mt-0.5">연결됨 ✓</div>
+          <div className="text-[10px] text-[color:var(--text-secondary)] mt-0.5">연결됨 ✓</div>
         </div>
       </div>
     </aside>

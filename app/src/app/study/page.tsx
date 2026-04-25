@@ -51,7 +51,7 @@ export default function StudyPage() {
       {/* Track header */}
       <GlassCard>
         <div className="flex items-start gap-4">
-          <div className="grid place-items-center size-14 rounded-2xl bg-gradient-to-br from-[color:var(--accent)] to-emerald-400 text-black text-3xl">
+          <div className="grid place-items-center size-14 rounded-2xl bg-gradient-to-br from-[color:var(--accent)] to-[color:var(--warm)] text-white text-3xl">
             {track.icon}
           </div>
           <div className="flex-1">

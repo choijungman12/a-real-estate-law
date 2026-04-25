@@ -227,7 +227,7 @@ export default function AuctionPage() {
       >
         <input {...getInputProps()} />
         <div className="grid place-items-center mb-4">
-          <div className="grid place-items-center size-16 rounded-2xl bg-gradient-to-br from-[color:var(--accent)] to-emerald-400 text-black">
+          <div className="grid place-items-center size-16 rounded-2xl bg-gradient-to-br from-[color:var(--accent)] to-[color:var(--warm)] text-white">
             <Upload className="size-8" />
           </div>
         </div>
@@ -292,7 +292,7 @@ export default function AuctionPage() {
             <GlassCard className="border-[color:var(--accent)]/40">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-3 flex-1 min-w-0">
-                  <div className="grid place-items-center size-10 rounded-xl bg-gradient-to-br from-[color:var(--accent)] to-emerald-400 text-black shrink-0">
+                  <div className="grid place-items-center size-10 rounded-xl bg-gradient-to-br from-[color:var(--accent)] to-[color:var(--warm)] text-white shrink-0">
                     <MapPin className="size-5" />
                   </div>
                   <div className="min-w-0">

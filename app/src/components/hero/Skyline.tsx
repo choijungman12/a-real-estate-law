@@ -11,12 +11,12 @@ export default function Skyline({ className = '' }: { className?: string }) {
     >
       <defs>
         <linearGradient id="sky-grad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="rgba(182,255,74,0.0)" />
-          <stop offset="100%" stopColor="rgba(182,255,74,0.18)" />
+          <stop offset="0%" stopColor="rgba(31,79,255,0.0)" />
+          <stop offset="100%" stopColor="rgba(31,79,255,0.18)" />
         </linearGradient>
         <linearGradient id="bld-grad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="rgba(255,255,255,0.10)" />
-          <stop offset="100%" stopColor="rgba(255,255,255,0.02)" />
+          <stop offset="0%" stopColor="rgba(31,79,255,0.20)" />
+          <stop offset="100%" stopColor="rgba(31,79,255,0.05)" />
         </linearGradient>
       </defs>
 

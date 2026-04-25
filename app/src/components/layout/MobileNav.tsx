@@ -16,7 +16,7 @@ const NAV = [
 export default function MobileNav() {
   const pathname = usePathname();
   return (
-    <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 border-t border-white/10 bg-black/70 backdrop-blur-xl">
+    <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 border-t border-[color:var(--border-subtle)] bg-white shadow-[0_-2px_12px_rgba(15,23,42,0.06)]">
       <div className="grid grid-cols-5">
         {NAV.map((item) => {
           const Icon = item.icon;
