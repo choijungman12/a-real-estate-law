@@ -1,6 +1,6 @@
 import { GlassCard, StatCard, Badge, SectionHeader } from '@/components/ui/Glass';
 import { withBase } from '@/lib/utils/href';
-import Skyline from '@/components/hero/Skyline';
+import GrowingBuilding from '@/components/hero/GrowingBuilding';
 import {
   Sparkles,
   TrendingUp,
@@ -19,46 +19,43 @@ export default function HomePage() {
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white via-white to-[color:var(--accent-soft)] border border-[color:var(--border-subtle)] p-8 md:p-12 min-h-[440px] shadow-sm">
-        <div className="absolute -top-32 -right-32 size-96 rounded-full bg-[color:var(--accent-soft)] blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-40 -left-20 size-80 rounded-full bg-[color:var(--warm-soft)] blur-3xl pointer-events-none" />
-        <Skyline className="absolute inset-x-0 bottom-0 w-full opacity-25 pointer-events-none" />
-
-        <div className="relative">
-          <span className="inline-flex items-center gap-2 rounded-full bg-[color:var(--accent)] text-white px-3 py-1 text-[10px] font-bold uppercase tracking-wider">
-            REAL ESTATE × AI
-          </span>
-          <h1 className="mt-4 text-3xl md:text-5xl font-bold tracking-tight text-[color:var(--text-primary)] leading-tight">
-            한국 부동산 모든 데이터,
-            <br />
-            <span className="text-[color:var(--accent)]">한 화면에서.</span>
-          </h1>
-          <p className="mt-5 text-[color:var(--text-secondary)] max-w-xl text-sm md:text-base leading-relaxed">
-            공식 OPEN API 11종 + 14개 주제 법령 + AI 권리분석.
-            경매·공매·실거래가·청약·분양·법령·뉴스·재개발 수지분석을 통합합니다.
-          </p>
-          <div className="mt-7 flex flex-wrap gap-3">
-            <a
-              href={withBase('/auction')}
-              className="group inline-flex items-center gap-2 rounded-xl bg-[color:var(--accent)] text-white px-6 py-3 text-sm font-bold shadow-lg shadow-[color:var(--accent-glow)] hover:bg-[color:var(--accent-hover)] transition"
-            >
-              <Sparkles className="size-4" /> 사건번호로 권리분석 시작
-              <ArrowUpRight className="size-4 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-            </a>
-            <a
-              href={withBase('/realestate')}
-              className="inline-flex items-center gap-2 rounded-xl bg-white border border-[color:var(--border-strong)] px-6 py-3 text-sm font-semibold text-[color:var(--text-primary)] hover:bg-[color:var(--surface-hover)]"
-            >
-              실거래가 검색
-            </a>
-            <a
-              href={withBase('/map')}
-              className="inline-flex items-center gap-2 rounded-xl bg-[color:var(--warm)] text-white px-6 py-3 text-sm font-bold hover:opacity-90"
-            >
-              GIS 지도 열기
-            </a>
+      <section className="relative overflow-hidden rounded-3xl bg-white border border-[color:var(--border-subtle)] p-8 md:p-14">
+        <div className="grid lg:grid-cols-2 gap-8 items-center">
+          {/* 좌측: 카피 */}
+          <div className="relative z-10">
+            <span className="hero-eyebrow">원스톱 부동산 AI</span>
+            <h1 className="hero-title mt-2">
+              부동산의 전 과정<br />
+              <span className="text-[color:var(--accent)]">처음부터 끝까지</span>
+            </h1>
+            <p className="mt-6 text-[color:var(--text-secondary)] max-w-md text-base leading-relaxed">
+              경매·공매·실거래가·청약·재개발 수지분석부터<br />
+              법령·뉴스·정책까지 — REAL ESTATE AI가 한 번에 도와드립니다.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <a href={withBase('/auction')} className="btn-primary">
+                <Sparkles className="size-4" /> 권리분석 상담 시작
+                <ArrowUpRight className="size-4" />
+              </a>
+              <a href={withBase('/map')} className="btn-secondary">
+                <MapIcon className="size-4" /> GIS 지도 열기
+              </a>
+            </div>
+          </div>
+          {/* 우측: Flexity 톤 자라는 빌딩 애니메이션 */}
+          <div className="relative">
+            <GrowingBuilding className="w-full h-auto max-w-[560px] mx-auto" />
           </div>
         </div>
+      </section>
+
+      {/* 큰 호스트 카피 (HOWBUILD 두 번째 섹션 톤) */}
+      <section className="text-center py-6 md:py-10">
+        <span className="section-eyebrow">사업성 분석부터 권리분석까지</span>
+        <h2 className="section-title mt-2">
+          복잡하고 어려운 부동산<br />
+          <span className="text-[color:var(--accent)]">결정하기 어렵지 않으세요?</span>
+        </h2>
       </section>
 
       {/* Stats */}

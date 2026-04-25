@@ -6,27 +6,30 @@
  */
 
 :root {
-  --bg-base: #f5f7fa;          /* 페이지 배경 — 매우 옅은 블루-그레이 */
+  /* HOWBUILD 톤 — 거의 흰색 + 옅은 라일락 그라디언트 */
+  --bg-base: #fafbff;
   --bg-deep: #ffffff;
-  --surface-1: #ffffff;        /* 카드 흰색 */
-  --surface-2: #ffffff;
-  --surface-hover: #f8fafc;
-  --surface-active: #eff6ff;
+  --surface-1: #ffffff;
+  --surface-2: #f6f7fb;
+  --surface-hover: #f4f5fa;
+  --surface-active: #eef0fe;
+  --surface-dark: #2a2f48;       /* 다크 카드 (챗봇 같은 액센트 카드) */
   --border-subtle: rgba(15, 23, 42, 0.06);
   --border-strong: rgba(15, 23, 42, 0.12);
-  --text-primary: #0f172a;     /* 거의 검정 네이비 */
-  --text-secondary: rgba(15, 23, 42, 0.72);
-  --text-muted: rgba(15, 23, 42, 0.5);
+  --text-primary: #1a1d2e;       /* 진한 차콜 */
+  --text-secondary: rgba(26, 29, 46, 0.7);
+  --text-muted: rgba(26, 29, 46, 0.45);
 
-  /* 메인 액센트 — 한국 부동산 신뢰 블루 (직방·KB부동산 톤) */
-  --accent: #1f4fff;
-  --accent-hover: #1640d4;
-  --accent-glow: rgba(31, 79, 255, 0.25);
-  --accent-soft: rgba(31, 79, 255, 0.08);
+  /* 메인 액센트 — 인디고 (HOWBUILD 톤) */
+  --accent: #4f46e5;
+  --accent-hover: #4338ca;
+  --accent-glow: rgba(79, 70, 229, 0.22);
+  --accent-soft: rgba(79, 70, 229, 0.08);
+  --accent-pale: #e0e7ff;        /* 매우 옅은 라벤더 */
 
-  /* 보조 액센트 — 매물 강조 오렌지 (직방 톤) */
-  --warm: #ff6f0f;
-  --warm-soft: rgba(255, 111, 15, 0.1);
+  /* 보조 액센트 — 따뜻한 옐로우 포인트 (HOWBUILD 일러스트 톤) */
+  --warm: #fbbf24;
+  --warm-soft: rgba(251, 191, 36, 0.12);
 
   /* 상태 컬러 */
   --success: #10b981;
@@ -61,7 +64,7 @@ body {
   font-feature-settings: 'tnum' 1, 'ss01' 1;
 }
 
-/* 부동산 사이트 — 옅은 블루 그라디언트 백드롭 (밝은 톤) */
+/* HOWBUILD 톤 — 옅은 라일락/스카이 백드롭 (전체적으로 매우 밝음) */
 body::before {
   content: '';
   position: fixed;
@@ -69,8 +72,8 @@ body::before {
   pointer-events: none;
   z-index: -1;
   background:
-    radial-gradient(ellipse 60% 40% at 100% 0%, rgba(31, 79, 255, 0.05), transparent 70%),
-    radial-gradient(ellipse 50% 30% at 0% 100%, rgba(255, 111, 15, 0.04), transparent 70%),
+    radial-gradient(ellipse 50% 30% at 90% 10%, rgba(79, 70, 229, 0.06), transparent 70%),
+    radial-gradient(ellipse 40% 25% at 10% 90%, rgba(168, 85, 247, 0.04), transparent 70%),
     var(--bg-base);
 }
 
@@ -90,14 +93,15 @@ body::before {
   background: rgba(15, 23, 42, 0.3);
 }
 
-/* ─── 카드 시스템 (기존 .glass 클래스 → 라이트 카드로 매핑) ──────── */
+/* ─── HOWBUILD 카드 시스템 — 둥근 모서리(20px), 옅은 그림자 ─── */
 
 .glass {
   background: var(--surface-1);
   border: 1px solid var(--border-subtle);
+  border-radius: 20px;
   box-shadow:
-    0 1px 2px rgba(15, 23, 42, 0.04),
-    0 4px 12px rgba(15, 23, 42, 0.04);
+    0 1px 2px rgba(15, 23, 42, 0.03),
+    0 6px 20px rgba(79, 70, 229, 0.04);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
@@ -105,12 +109,24 @@ body::before {
 .glass-strong {
   background: var(--surface-1);
   border: 1px solid var(--border-strong);
+  border-radius: 24px;
   box-shadow:
-    0 2px 6px rgba(15, 23, 42, 0.06),
-    0 12px 32px rgba(15, 23, 42, 0.08);
+    0 4px 12px rgba(15, 23, 42, 0.05),
+    0 20px 48px rgba(79, 70, 229, 0.08);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
+
+/* 다크 액센트 카드 (HOWBUILD 챗봇 박스 같은) */
+.glass-dark {
+  background: var(--surface-dark);
+  color: #ffffff;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 8px 32px rgba(42, 47, 72, 0.18);
+}
+.glass-dark .text-secondary,
+.glass-dark .text-muted { color: rgba(255, 255, 255, 0.7); }
 
 .accent-glow {
   box-shadow:
@@ -195,17 +211,83 @@ a {
   -webkit-backdrop-filter: none;
 }
 
-/* 부동산 사이트 시그니처 — 매물 가격용 강조 컬러 */
+/* 부동산 사이트 시그니처 */
 .text-accent-strong {
   color: var(--accent);
   font-weight: 700;
 }
 
-/* 액센트 버튼 텍스트 (블루 배경 위 흰 글씨) */
+/* 액센트 버튼 텍스트 (인디고 배경 위 흰 글씨) */
 .bg-\[color\:var\(--accent\)\] {
   color: #ffffff !important;
 }
 .text-black {
-  /* 액센트 배경 위 흑 글씨 잔재 — 화이트로 강제 */
   color: #ffffff !important;
+}
+
+/* HOWBUILD 시그니처 타이포 — 큰 헤드라인 강조 */
+.hero-title {
+  font-size: clamp(2rem, 5vw, 3.75rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--text-primary);
+}
+.hero-eyebrow {
+  display: inline-block;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 0.75rem;
+}
+.section-eyebrow {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.02em;
+}
+.section-title {
+  font-size: clamp(1.5rem, 3.5vw, 2.5rem);
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+/* CTA 버튼 — HOWBUILD 톤 (큰 사이즈, 진한 배경) */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--accent);
+  color: #ffffff;
+  padding: 0.875rem 1.75rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  transition: background 0.15s, transform 0.15s;
+  box-shadow: 0 4px 14px var(--accent-glow);
+}
+.btn-primary:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+}
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #ffffff;
+  color: var(--text-primary);
+  padding: 0.875rem 1.75rem;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  transition: border-color 0.15s, background 0.15s;
+}
+.btn-secondary:hover {
+  border-color: var(--accent);
+  color: var(--accent);
 }
