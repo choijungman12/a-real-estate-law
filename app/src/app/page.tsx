@@ -1,6 +1,6 @@
 import { GlassCard, StatCard, Badge, SectionHeader } from '@/components/ui/Glass';
 import { withBase } from '@/lib/utils/href';
-import GrowingBuilding from '@/components/hero/GrowingBuilding';
+import WhiteCityScenario from '@/components/hero/WhiteCityScenario';
 import {
   Sparkles,
   TrendingUp,
@@ -42,9 +42,9 @@ export default function HomePage() {
               </a>
             </div>
           </div>
-          {/* 우측: Flexity 톤 자라는 빌딩 애니메이션 */}
+          {/* 우측: Flexity 톤 — 흰 도시 미니어처 + 4단계 컬러 빌딩 시나리오 */}
           <div className="relative">
-            <GrowingBuilding className="w-full h-auto max-w-[560px] mx-auto" />
+            <WhiteCityScenario className="w-full h-auto max-w-[640px] mx-auto" />
           </div>
         </div>
       </section>
