@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { formatKRW, formatArea } from '@/lib/utils/cn';
 import { GlassCard, Badge, SectionHeader } from '@/components/ui/Glass';
 import AutoBanner from '@/components/common/AutoBanner';
+import { SIDO } from '@/lib/geo/sigungu';
 import type { AptTradeRecord, AptRentRecord } from '@/types/realestate';
 import { Search, TrendingUp } from 'lucide-react';
 
@@ -18,6 +19,11 @@ const QUICK_SIGUNGU = [
   { code: '11440', name: '마포구' },
   { code: '11200', name: '성동구' },
 ];
+
+function getSidoOf(code: string) {
+  for (const s of SIDO) if (s.sigungu.find((x) => x.code === code)) return s.code;
+  return '11';
+}
 
 export default function RealEstatePage() {
   const [type, setType] = useState<'trade' | 'rent'>('trade');
@@ -63,7 +69,7 @@ export default function RealEstatePage() {
       <AutoBanner required={['data_go_kr']} />
 
       <GlassCard>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
           <div className="md:col-span-1">
             <label className="text-xs text-[color:var(--text-muted)] uppercase tracking-wider">
               유형
@@ -93,14 +99,38 @@ export default function RealEstatePage() {
           </div>
           <div>
             <label className="text-xs text-[color:var(--text-muted)] uppercase tracking-wider">
-              시군구코드
+              시·도
             </label>
-            <input
+            <select
+              value={getSidoOf(sigunguCode)}
+              onChange={(e) => {
+                const sido = SIDO.find((s) => s.code === e.target.value);
+                if (sido && sido.sigungu[0]) setSigunguCode(sido.sigungu[0].code);
+              }}
+              className="mt-1 w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-[color:var(--accent)]/40"
+            >
+              {SIDO.map((s) => (
+                <option key={s.code} value={s.code} className="bg-zinc-900">
+                  {s.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="text-xs text-[color:var(--text-muted)] uppercase tracking-wider">
+              시·군·구
+            </label>
+            <select
               value={sigunguCode}
               onChange={(e) => setSigunguCode(e.target.value)}
-              placeholder="11680"
               className="mt-1 w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-[color:var(--accent)]/40"
-            />
+            >
+              {(SIDO.find((s) => s.code === getSidoOf(sigunguCode))?.sigungu ?? []).map((g) => (
+                <option key={g.code} value={g.code} className="bg-zinc-900">
+                  {g.name} ({g.code})
+                </option>
+              ))}
+            </select>
           </div>
           <div>
             <label className="text-xs text-[color:var(--text-muted)] uppercase tracking-wider">
