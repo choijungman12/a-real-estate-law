@@ -1,6 +1,6 @@
 import { GlassCard, StatCard, Badge, SectionHeader } from '@/components/ui/Glass';
 import { withBase } from '@/lib/utils/href';
-import WhiteCityScenario from '@/components/hero/WhiteCityScenario';
+import Building3DScene from '@/components/hero/Building3DLoader';
 import {
   Sparkles,
   TrendingUp,
@@ -42,9 +42,9 @@ export default function HomePage() {
               </a>
             </div>
           </div>
-          {/* 우측: Flexity 톤 — 흰 도시 미니어처 + 4단계 컬러 빌딩 시나리오 */}
+          {/* 우측: react-three-fiber 진짜 3D 시뮬레이션 */}
           <div className="relative">
-            <WhiteCityScenario className="w-full h-auto max-w-[640px] mx-auto" />
+            <Building3DScene />
           </div>
         </div>
       </section>
