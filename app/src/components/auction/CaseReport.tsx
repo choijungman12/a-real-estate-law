@@ -31,9 +31,23 @@ const SEVERITY_COLOR: Record<string, string> = {
   낮음: 'border-white/10 bg-white/5 text-[color:var(--text-secondary)]',
 };
 
-export default function CaseReport({ report }: { report: AuctionCaseReport }) {
+export default function CaseReport({
+  report,
+  source,
+  cachedAt,
+}: {
+  report: AuctionCaseReport;
+  source?: 'cache' | 'fresh';
+  cachedAt?: string;
+}) {
   return (
     <div className="space-y-6">
+      {source === 'cache' && (
+        <div className="text-xs text-[color:var(--accent)] flex items-center gap-2">
+          ⚡ 캐시에서 즉시 반환 — {cachedAt ? new Date(cachedAt).toLocaleString('ko-KR') : '저장됨'}
+          (analysis_cache 테이블)
+        </div>
+      )}
       {/* 헤더 */}
       <GlassCard className="border-[color:var(--accent)]/40">
         <div className="flex items-center gap-2 text-xs">

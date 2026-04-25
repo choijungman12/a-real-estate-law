@@ -17,6 +17,8 @@ export function GET() {
       kakao_rest: !!e.KAKAO_REST_KEY,
       naver: !!(e.NAVER_CLIENT_ID && e.NAVER_CLIENT_SECRET),
       telegram: !!e.TELEGRAM_BOT_TOKEN,
+      database: !!e.DATABASE_URL,
+      iros: !!e.IROS_API_KEY,
     },
   });
 }

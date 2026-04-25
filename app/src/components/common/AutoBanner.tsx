@@ -51,6 +51,17 @@ const KEY_SPECS: Record<keyof HealthKeys, KeySpec> = {
     label: '텔레그램 봇 (알림)',
     url: 'https://t.me/BotFather',
   },
+  database: {
+    envVar: 'DATABASE_URL',
+    label: 'Supabase PostgreSQL (시계열·캐시)',
+    url: 'https://supabase.com/dashboard/new',
+    helper: 'Settings → Database → Transaction pooler URI',
+  },
+  iros: {
+    envVar: 'IROS_API_KEY',
+    label: '법원 등기정보광장 (선택, 권리분석 정확도 향상)',
+    url: 'https://data.iros.go.kr/rp/oa/openOapiAppl.do',
+  },
 };
 
 export default function AutoBanner({

@@ -12,6 +12,8 @@ export type HealthKeys = {
   kakao_rest: boolean;
   naver: boolean;
   telegram: boolean;
+  database: boolean;
+  iros: boolean;
 };
 
 let cache: HealthKeys | null = null;
