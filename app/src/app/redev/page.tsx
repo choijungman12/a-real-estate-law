@@ -21,7 +21,7 @@ import type {
   ZoningType,
   BuildingStructure,
 } from '@/types/redevelopment';
-import { Building2, Calculator, ScrollText, FileSignature } from 'lucide-react';
+import { Building2, Calculator, ScrollText, FileSignature, ArrowRight } from 'lucide-react';
 
 type Tab = 'overview' | 'appraisal' | 'feasibility' | 'consent';
 
@@ -33,7 +33,14 @@ export default function RedevPage() {
       <SectionHeader
         title="정비사업 워크스페이스"
         subtitle="재개발·재건축 — 보상감정평가, 비례율·분담금, 동의서 발급, 법령 인용"
-        action={<Badge tone="accent">REDEVELOPMENT</Badge>}
+        action={
+          <a
+            href="/redev/cashflow"
+            className="inline-flex items-center gap-1 rounded-lg bg-[color:var(--accent)] text-black px-3 py-1.5 text-xs font-semibold"
+          >
+            종합 수지분석 (PDF 양식) <ArrowRight className="size-3" />
+          </a>
+        }
       />
 
       <div className="flex gap-1 rounded-xl glass p-1 w-fit overflow-x-auto">

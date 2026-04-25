@@ -29,6 +29,7 @@ const NAV = [
   { href: '/applyhome', label: '청약·분양', icon: KeyRound },
   { href: '/calc', label: '수지분석 계산기', icon: Calculator },
   { href: '/redev', label: '정비사업 (재개발)', icon: Hammer, accent: true },
+  { href: '/redev/cashflow', label: '└ 종합 수지분석', icon: Calculator },
   { href: '/law', label: '법령 (14주제)', icon: ScrollText },
   { href: '/study', label: '학습 커리큘럼', icon: GraduationCap },
   { href: '/news', label: '뉴스', icon: Newspaper },

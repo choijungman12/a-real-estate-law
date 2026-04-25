@@ -59,6 +59,15 @@ export type AuctionCase = {
 };
 
 export type AuctionAnalysis = {
+  /** PDF에서 추출된 핵심 식별 정보 (인근 실거래가 자동 조회용) */
+  caseSummary?: {
+    caseNumber?: string;
+    address?: string;        // 도로명 또는 지번 주소 — 시·군·구 추출에 사용
+    propertyType?: string;
+    appraisalAmount?: number;
+    minimumBidPrice?: number;
+    bidDate?: string;
+  };
   cancellationBase?: { type: RightType; date: string; holder: string };
   survivingRights: Right[];
   extinguishedRights: Right[];

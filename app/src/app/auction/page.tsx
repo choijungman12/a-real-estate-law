@@ -5,8 +5,9 @@ import { useDropzone } from 'react-dropzone';
 import { formatKRW } from '@/lib/utils/cn';
 import { GlassCard, Badge, SectionHeader } from '@/components/ui/Glass';
 import AutoBanner from '@/components/common/AutoBanner';
+import PropertyDetailModal, { type DetailItem } from '@/components/map/PropertyDetailModal';
 import type { AuctionAnalysis } from '@/types/auction';
-import { Upload, Sparkles, AlertTriangle, FileText, BookOpen, Eye } from 'lucide-react';
+import { Upload, Sparkles, AlertTriangle, FileText, BookOpen, Eye, MapPin } from 'lucide-react';
 
 export default function AuctionPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -14,6 +15,7 @@ export default function AuctionPage() {
   const [analysis, setAnalysis] = useState<AuctionAnalysis | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [detailItem, setDetailItem] = useState<DetailItem | null>(null);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: { 'application/pdf': ['.pdf'] },
@@ -131,6 +133,43 @@ export default function AuctionPage() {
 
       {analysis && (
         <div className="space-y-4">
+          {/* PDF에서 추출한 매물 식별 정보 + 인근 실거래가 자동 조회 트리거 */}
+          {analysis.caseSummary?.address && (
+            <GlassCard className="border-[color:var(--accent)]/40">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start gap-3 flex-1 min-w-0">
+                  <div className="grid place-items-center size-10 rounded-xl bg-gradient-to-br from-[color:var(--accent)] to-emerald-400 text-black shrink-0">
+                    <MapPin className="size-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-xs text-[color:var(--accent)]">
+                      {analysis.caseSummary.caseNumber ?? '사건번호 미인식'} · {analysis.caseSummary.propertyType ?? '용도 미인식'}
+                    </div>
+                    <div className="font-semibold text-sm mt-0.5 truncate">
+                      {analysis.caseSummary.address}
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() =>
+                    setDetailItem({
+                      id: analysis.caseSummary!.caseNumber ?? 'auction',
+                      title: analysis.caseSummary!.caseNumber ?? '경매 매물',
+                      address: analysis.caseSummary!.address!,
+                      category: 'auction',
+                      appraisalAmount: analysis.caseSummary!.appraisalAmount,
+                      minimumBidPrice: analysis.caseSummary!.minimumBidPrice,
+                      startDate: analysis.caseSummary!.bidDate,
+                    })
+                  }
+                  className="inline-flex items-center gap-1 rounded-lg bg-[color:var(--accent)] text-black px-3 py-1.5 text-xs font-semibold shrink-0"
+                >
+                  <MapPin className="size-3" /> 인근 실거래가 자동 조회
+                </button>
+              </div>
+            </GlassCard>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <GlassCard>
               <div className="text-xs uppercase text-[color:var(--text-muted)]">신뢰도</div>
@@ -262,6 +301,8 @@ export default function AuctionPage() {
           )}
         </div>
       )}
+
+      <PropertyDetailModal item={detailItem} onClose={() => setDetailItem(null)} />
     </div>
   );
 }

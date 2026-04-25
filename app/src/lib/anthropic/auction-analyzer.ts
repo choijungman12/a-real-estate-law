@@ -19,6 +19,14 @@ const SYSTEM_PROMPT = `너는 한국 부동산 경매 권리분석 전문가다.
 
 응답은 반드시 다음 JSON 스키마를 따른다:
 {
+  "caseSummary": {
+    "caseNumber": "2025타경12345",
+    "address": "서울특별시 강남구 도곡동 ...",
+    "propertyType": "아파트|오피스텔|상가|토지|단독|공장",
+    "appraisalAmount": 1500000000,
+    "minimumBidPrice": 1050000000,
+    "bidDate": "YYYY-MM-DD"
+  },
   "cancellationBase": { "type": "...", "date": "YYYY-MM-DD", "holder": "..." },
   "survivingRights": [...],
   "extinguishedRights": [...],
@@ -28,6 +36,8 @@ const SYSTEM_PROMPT = `너는 한국 부동산 경매 권리분석 전문가다.
   "discrepanciesWithSource": ["..."],
   "confidence": 0.85
 }
+
+caseSummary.address 는 인근 실거래가 자동 조회에 사용되므로 시·군·구가 명확히 포함된 형태로 추출하라.
 
 JSON만 반환하고 설명 텍스트는 넣지 마라. 코드펜스(\`\`\`json)도 사용하지 마라.`;
 
