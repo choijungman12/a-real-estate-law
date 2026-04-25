@@ -10,7 +10,10 @@
 - **로컬 풀스택 (API 동작)**: `cd app && pnpm dev` → http://localhost:3013
 - **풀스택 운영 배포 권장**: Vercel (Anthropic·data.go.kr·법령 API 모두 작동)
 
-⚙️ GitHub Pages 활성화: Repository Settings → Pages → Source: **GitHub Actions** 선택 (한 번만)
+⚙️ GitHub Pages 활성화 (한 번만):
+1. https://github.com/choijungman12/a-real-estate-law/settings/pages
+2. Build and deployment → Source: **GitHub Actions**
+3. 저장 후 Actions 탭에서 "Deploy to GitHub Pages" 워크플로우 재실행 (Re-run)
 
 ## 디렉터리 구조
 
