@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { formatKRW } from '@/lib/utils/cn';
+import { GlassCard, Badge, SectionHeader } from '@/components/ui/Glass';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { OnbidItem } from '@/lib/api/onbid';
 
 export default function OnbidPage() {
@@ -35,81 +37,93 @@ export default function OnbidPage() {
   }, [page]);
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">공매 물건 (온비드)</h1>
-        <p className="text-sm text-zinc-600 mt-1">
-          한국자산관리공사(KAMCO) 캠코공매물건 OPEN API · 공공데이터포털
-        </p>
-      </div>
+    <div className="space-y-6 max-w-7xl mx-auto">
+      <SectionHeader
+        title="공매 (온비드)"
+        subtitle="한국자산관리공사 KAMCO 캠코공매물건 OPEN API"
+        action={<Badge tone="accent">KAMCO</Badge>}
+      />
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 rounded p-3 text-sm">
+        <GlassCard className="border-red-500/30 bg-red-500/5 text-red-300 text-sm">
           {error}
-        </div>
+        </GlassCard>
       )}
 
-      <div className="bg-white border rounded-xl overflow-hidden">
-        <div className="px-4 py-3 border-b bg-zinc-50 text-sm flex justify-between">
-          <span>총 {total}건 (페이지 {page})</span>
+      <GlassCard className="p-0 overflow-hidden">
+        <div className="px-5 py-3 border-b border-white/5 flex items-center justify-between">
+          <div className="text-sm">
+            총 <span className="font-semibold text-[color:var(--accent)]">{total}</span>건
+            <span className="text-[color:var(--text-muted)] ml-2">· {page} 페이지</span>
+          </div>
           <div className="flex gap-2">
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1 || loading}
-              className="border rounded px-3 py-1 text-xs disabled:opacity-50"
+              className="grid place-items-center size-8 rounded-lg bg-white/5 border border-white/10 disabled:opacity-30"
             >
-              이전
+              <ChevronLeft className="size-4" />
             </button>
             <button
               onClick={() => setPage((p) => p + 1)}
               disabled={loading}
-              className="border rounded px-3 py-1 text-xs disabled:opacity-50"
+              className="grid place-items-center size-8 rounded-lg bg-white/5 border border-white/10 disabled:opacity-30"
             >
-              다음
+              <ChevronRight className="size-4" />
             </button>
           </div>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-zinc-50 text-left">
-              <tr>
-                <th className="px-3 py-2">물건명</th>
-                <th className="px-3 py-2">소재지</th>
-                <th className="px-3 py-2">용도</th>
-                <th className="px-3 py-2 text-right">감정가</th>
-                <th className="px-3 py-2 text-right">최저입찰가</th>
-                <th className="px-3 py-2">입찰기간</th>
+            <thead className="text-[color:var(--text-muted)] text-xs uppercase tracking-wider">
+              <tr className="border-b border-white/5">
+                <th className="px-4 py-3 text-left">물건명</th>
+                <th className="px-4 py-3 text-left">소재지</th>
+                <th className="px-4 py-3 text-left">용도</th>
+                <th className="px-4 py-3 text-right">감정가</th>
+                <th className="px-4 py-3 text-right">최저입찰가</th>
+                <th className="px-4 py-3 text-left">입찰기간</th>
               </tr>
             </thead>
             <tbody>
               {loading && (
                 <tr>
-                  <td colSpan={6} className="px-3 py-6 text-center text-zinc-500">
-                    조회 중...
+                  <td colSpan={6} className="px-4 py-12 text-center text-[color:var(--text-muted)]">
+                    조회 중…
                   </td>
                 </tr>
               )}
               {!loading &&
                 items.map((it) => (
-                  <tr key={`${it.cltrNo}-${it.pbctNo}`} className="border-t">
-                    <td className="px-3 py-2">{it.cltrNm}</td>
-                    <td className="px-3 py-2 text-zinc-600">{it.cltrAddr}</td>
-                    <td className="px-3 py-2 text-xs">
-                      {it.cltrUseLclsfNm} / {it.cltrUseMclsfNm}
+                  <tr
+                    key={`${it.cltrNo}-${it.pbctNo}`}
+                    className="border-b border-white/5 hover:bg-white/5"
+                  >
+                    <td className="px-4 py-3 font-medium">{it.cltrNm}</td>
+                    <td className="px-4 py-3 text-[color:var(--text-secondary)]">
+                      {it.cltrAddr}
                     </td>
-                    <td className="px-3 py-2 text-right">{formatKRW(it.apprAmt)}</td>
-                    <td className="px-3 py-2 text-right font-medium">
+                    <td className="px-4 py-3">
+                      <Badge tone="neutral">
+                        {it.cltrUseLclsfNm}/{it.cltrUseMclsfNm}
+                      </Badge>
+                    </td>
+                    <td className="px-4 py-3 text-right text-[color:var(--text-secondary)] tabular-nums">
+                      {formatKRW(it.apprAmt)}
+                    </td>
+                    <td className="px-4 py-3 text-right font-semibold text-[color:var(--accent)] tabular-nums">
                       {formatKRW(it.minBidPrc)}
                     </td>
-                    <td className="px-3 py-2 text-xs">
-                      {it.pbctBgngDtm} ~ {it.pbctEndDtm}
+                    <td className="px-4 py-3 text-xs text-[color:var(--text-muted)] tabular-nums">
+                      {it.pbctBgngDtm}
+                      <br />~ {it.pbctEndDtm}
                     </td>
                   </tr>
                 ))}
             </tbody>
           </table>
         </div>
-      </div>
+      </GlassCard>
     </div>
   );
 }

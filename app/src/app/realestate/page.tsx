@@ -2,14 +2,25 @@
 
 import { useState } from 'react';
 import { formatKRW, formatArea } from '@/lib/utils/cn';
+import { GlassCard, Badge, SectionHeader } from '@/components/ui/Glass';
 import type { AptTradeRecord, AptRentRecord } from '@/types/realestate';
+import { Search, TrendingUp } from 'lucide-react';
 
 type TradeResp = { items: AptTradeRecord[]; totalCount: number };
 type RentResp = { items: AptRentRecord[]; totalCount: number };
 
+const QUICK_SIGUNGU = [
+  { code: '11680', name: '강남구' },
+  { code: '11650', name: '서초구' },
+  { code: '11710', name: '송파구' },
+  { code: '11170', name: '용산구' },
+  { code: '11440', name: '마포구' },
+  { code: '11200', name: '성동구' },
+];
+
 export default function RealEstatePage() {
   const [type, setType] = useState<'trade' | 'rent'>('trade');
-  const [sigunguCode, setSigunguCode] = useState('11680'); // 강남구
+  const [sigunguCode, setSigunguCode] = useState('11680');
   const [ym, setYm] = useState(() => {
     const d = new Date();
     d.setMonth(d.getMonth() - 1);
@@ -41,109 +52,165 @@ export default function RealEstatePage() {
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">실거래가 검색</h1>
-      <p className="text-sm text-zinc-600">
-        국토교통부 실거래가 OPEN API (시군구코드 5자리 + 계약 연월 6자리)
-      </p>
+    <div className="space-y-6 max-w-7xl mx-auto">
+      <SectionHeader
+        title="실거래가 검색"
+        subtitle="국토교통부 실거래가 OPEN API · 시군구코드 + 계약 연월"
+        action={<Badge tone="accent">MOLIT</Badge>}
+      />
 
-      <div className="bg-white border rounded-xl p-4 grid grid-cols-1 md:grid-cols-4 gap-3">
-        <select
-          value={type}
-          onChange={(e) => setType(e.target.value as 'trade' | 'rent')}
-          className="border rounded px-3 py-2"
-        >
-          <option value="trade">매매</option>
-          <option value="rent">전월세</option>
-        </select>
-        <input
-          value={sigunguCode}
-          onChange={(e) => setSigunguCode(e.target.value)}
-          placeholder="시군구코드 5자리"
-          className="border rounded px-3 py-2"
-        />
-        <input
-          value={ym}
-          onChange={(e) => setYm(e.target.value)}
-          placeholder="YYYYMM"
-          className="border rounded px-3 py-2"
-        />
-        <button
-          onClick={search}
-          disabled={loading}
-          className="bg-zinc-900 text-white rounded px-4 py-2 hover:bg-zinc-800 disabled:opacity-50"
-        >
-          {loading ? '조회 중...' : '검색'}
-        </button>
-      </div>
-
-      <div className="text-xs text-zinc-500">
-        대표 시군구코드: 강남구 11680 / 서초구 11650 / 송파구 11710 / 용산구 11170 / 마포구 11440
-      </div>
+      <GlassCard>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <div className="md:col-span-1">
+            <label className="text-xs text-[color:var(--text-muted)] uppercase tracking-wider">
+              유형
+            </label>
+            <div className="mt-1 flex gap-2">
+              <button
+                onClick={() => setType('trade')}
+                className={`flex-1 rounded-lg px-3 py-2 text-sm border ${
+                  type === 'trade'
+                    ? 'bg-[color:var(--accent)] text-black border-transparent'
+                    : 'bg-white/5 border-white/10 text-[color:var(--text-secondary)]'
+                }`}
+              >
+                매매
+              </button>
+              <button
+                onClick={() => setType('rent')}
+                className={`flex-1 rounded-lg px-3 py-2 text-sm border ${
+                  type === 'rent'
+                    ? 'bg-[color:var(--accent)] text-black border-transparent'
+                    : 'bg-white/5 border-white/10 text-[color:var(--text-secondary)]'
+                }`}
+              >
+                전월세
+              </button>
+            </div>
+          </div>
+          <div>
+            <label className="text-xs text-[color:var(--text-muted)] uppercase tracking-wider">
+              시군구코드
+            </label>
+            <input
+              value={sigunguCode}
+              onChange={(e) => setSigunguCode(e.target.value)}
+              placeholder="11680"
+              className="mt-1 w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-[color:var(--accent)]/40"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-[color:var(--text-muted)] uppercase tracking-wider">
+              계약 연월
+            </label>
+            <input
+              value={ym}
+              onChange={(e) => setYm(e.target.value)}
+              placeholder="YYYYMM"
+              className="mt-1 w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-[color:var(--accent)]/40"
+            />
+          </div>
+          <div className="flex items-end">
+            <button
+              onClick={search}
+              disabled={loading}
+              className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-[color:var(--accent)] text-black px-4 py-2 text-sm font-semibold disabled:opacity-50 accent-glow"
+            >
+              <Search className="size-4" />
+              {loading ? '조회 중…' : '검색'}
+            </button>
+          </div>
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {QUICK_SIGUNGU.map((q) => (
+            <button
+              key={q.code}
+              onClick={() => setSigunguCode(q.code)}
+              className={`text-xs px-2.5 py-1 rounded-full border transition ${
+                sigunguCode === q.code
+                  ? 'bg-[color:var(--accent-soft)] border-[color:var(--accent-soft)] text-[color:var(--accent)]'
+                  : 'bg-white/5 border-white/10 text-[color:var(--text-secondary)] hover:bg-white/10'
+              }`}
+            >
+              {q.name} {q.code}
+            </button>
+          ))}
+        </div>
+      </GlassCard>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 rounded p-3 text-sm">
+        <GlassCard className="border-red-500/30 bg-red-500/5 text-red-300 text-sm">
           {error}
-        </div>
+        </GlassCard>
       )}
 
       {data && (
-        <div className="bg-white border rounded-xl overflow-hidden">
-          <div className="px-4 py-3 border-b bg-zinc-50 text-sm">
-            총 {data.totalCount}건
+        <GlassCard className="p-0 overflow-hidden">
+          <div className="px-5 py-3 border-b border-white/5 flex items-center justify-between">
+            <div className="text-sm">
+              총 <span className="font-semibold text-[color:var(--accent)]">{data.totalCount}</span>건
+            </div>
+            <Badge tone="neutral">
+              <TrendingUp className="size-3" /> {type === 'trade' ? '매매' : '전월세'}
+            </Badge>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-zinc-50 text-left">
-                <tr>
-                  <th className="px-3 py-2">단지명</th>
-                  <th className="px-3 py-2">동/지번</th>
-                  <th className="px-3 py-2">계약일</th>
-                  <th className="px-3 py-2">전용면적</th>
-                  <th className="px-3 py-2">층</th>
-                  <th className="px-3 py-2 text-right">
-                    {type === 'trade' ? '거래금액' : '보증금/월세'}
+              <thead className="text-[color:var(--text-muted)] text-xs uppercase tracking-wider">
+                <tr className="border-b border-white/5">
+                  <th className="px-4 py-3 text-left">단지명</th>
+                  <th className="px-4 py-3 text-left">동/지번</th>
+                  <th className="px-4 py-3 text-left">계약일</th>
+                  <th className="px-4 py-3 text-left">전용</th>
+                  <th className="px-4 py-3 text-left">층</th>
+                  <th className="px-4 py-3 text-right">
+                    {type === 'trade' ? '거래금액' : '보증/월세'}
                   </th>
                 </tr>
               </thead>
               <tbody>
                 {type === 'trade' &&
                   (data as TradeResp).items.map((it, i) => (
-                    <tr key={i} className="border-t">
-                      <td className="px-3 py-2">{it.apartmentName}</td>
-                      <td className="px-3 py-2">
+                    <tr key={i} className="border-b border-white/5 hover:bg-white/5">
+                      <td className="px-4 py-3">{it.apartmentName}</td>
+                      <td className="px-4 py-3 text-[color:var(--text-secondary)]">
                         {it.dong} {it.jibun}
                       </td>
-                      <td className="px-3 py-2">
+                      <td className="px-4 py-3 text-[color:var(--text-secondary)] tabular-nums">
                         {it.dealYear}.{String(it.dealMonth).padStart(2, '0')}.
                         {String(it.dealDay).padStart(2, '0')}
                       </td>
-                      <td className="px-3 py-2">{formatArea(it.exclusiveArea)}</td>
-                      <td className="px-3 py-2">{it.floor}층</td>
-                      <td className="px-3 py-2 text-right font-medium">
+                      <td className="px-4 py-3 text-[color:var(--text-secondary)] tabular-nums">
+                        {formatArea(it.exclusiveArea)}
+                      </td>
+                      <td className="px-4 py-3 text-[color:var(--text-secondary)]">{it.floor}층</td>
+                      <td className="px-4 py-3 text-right font-semibold text-[color:var(--accent)] tabular-nums">
                         {formatKRW(it.dealAmount)}
                       </td>
                     </tr>
                   ))}
                 {type === 'rent' &&
                   (data as RentResp).items.map((it, i) => (
-                    <tr key={i} className="border-t">
-                      <td className="px-3 py-2">{it.apartmentName}</td>
-                      <td className="px-3 py-2">
+                    <tr key={i} className="border-b border-white/5 hover:bg-white/5">
+                      <td className="px-4 py-3">{it.apartmentName}</td>
+                      <td className="px-4 py-3 text-[color:var(--text-secondary)]">
                         {it.dong} {it.jibun}
                       </td>
-                      <td className="px-3 py-2">
+                      <td className="px-4 py-3 text-[color:var(--text-secondary)] tabular-nums">
                         {it.contractYear}.{String(it.contractMonth).padStart(2, '0')}.
                         {String(it.contractDay).padStart(2, '0')}
                       </td>
-                      <td className="px-3 py-2">{formatArea(it.exclusiveArea)}</td>
-                      <td className="px-3 py-2">{it.floor}층</td>
-                      <td className="px-3 py-2 text-right">
-                        {formatKRW(it.deposit)}
+                      <td className="px-4 py-3 text-[color:var(--text-secondary)] tabular-nums">
+                        {formatArea(it.exclusiveArea)}
+                      </td>
+                      <td className="px-4 py-3 text-[color:var(--text-secondary)]">{it.floor}층</td>
+                      <td className="px-4 py-3 text-right tabular-nums">
+                        <span className="text-[color:var(--accent)] font-semibold">
+                          {formatKRW(it.deposit)}
+                        </span>
                         {it.monthlyRent > 0 && (
-                          <span className="text-zinc-500 text-xs">
-                            {' '}
-                            / 월 {formatKRW(it.monthlyRent)}
+                          <span className="text-[color:var(--text-muted)] text-xs block">
+                            월 {formatKRW(it.monthlyRent)}
                           </span>
                         )}
                       </td>
@@ -152,7 +219,7 @@ export default function RealEstatePage() {
               </tbody>
             </table>
           </div>
-        </div>
+        </GlassCard>
       )}
     </div>
   );

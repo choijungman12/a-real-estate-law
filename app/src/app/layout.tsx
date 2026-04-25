@@ -1,47 +1,31 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import Sidebar from '@/components/layout/Sidebar';
+import Topbar from '@/components/layout/Topbar';
+import MobileNav from '@/components/layout/MobileNav';
 
 export const metadata: Metadata = {
-  title: '부동산 플랫폼 — 경공매·실거래가·권리분석',
+  title: 'Real Estate AI — 경공매·실거래가·권리분석',
   description:
-    '한국 부동산 종합 플랫폼: 지지옥션 PDF 권리분석, 공매(온비드), 실거래가, 청약, 법령',
+    '한국 부동산 종합 플랫폼: 지지옥션 PDF AI 권리분석, 공매(온비드), 실거래가, 청약, 14개 주제 법령 카탈로그',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ko" className="h-full antialiased">
-      <body className="bg-zinc-50 text-zinc-900 min-h-screen">
-        <header className="border-b bg-white">
-          <nav className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
-            <a href="/" className="font-bold text-lg">
-              🏠 부동산 플랫폼
-            </a>
-            <div className="flex gap-4 text-sm">
-              <a href="/realestate" className="hover:underline">
-                실거래가
-              </a>
-              <a href="/onbid" className="hover:underline">
-                공매
-              </a>
-              <a href="/auction" className="hover:underline">
-                경매 권리분석
-              </a>
-              <a href="/applyhome" className="hover:underline">
-                청약
-              </a>
-              <a href="/law" className="hover:underline">
-                법령
-              </a>
-              <a href="/news" className="hover:underline">
-                뉴스
-              </a>
-            </div>
-          </nav>
-        </header>
-        <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>
-        <footer className="mx-auto max-w-6xl px-4 py-8 text-xs text-zinc-500 border-t mt-12">
-          데이터 출처: 국토교통부, 한국자산관리공사(온비드), 한국부동산원, 국가법령정보센터, V월드, LH, 카카오맵, 네이버
-        </footer>
+    <html lang="ko" className="h-full">
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"
+        />
+      </head>
+      <body className="min-h-screen flex">
+        <Sidebar />
+        <div className="flex-1 min-w-0 flex flex-col">
+          <Topbar />
+          <main className="flex-1 px-4 md:px-8 py-6 md:py-8 pb-24 md:pb-8">{children}</main>
+        </div>
+        <MobileNav />
       </body>
     </html>
   );

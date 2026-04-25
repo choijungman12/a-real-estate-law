@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { formatKRW } from '@/lib/utils/cn';
+import { GlassCard, Badge, SectionHeader } from '@/components/ui/Glass';
 import type { AuctionAnalysis } from '@/types/auction';
+import { Upload, Sparkles, AlertTriangle, FileText, BookOpen, Eye } from 'lucide-react';
 
 export default function AuctionPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -34,10 +36,7 @@ export default function AuctionPage() {
       const fd = new FormData();
       fd.append('file', file);
       fd.append('model', model);
-      const res = await fetch('/api/auction-analysis', {
-        method: 'POST',
-        body: fd,
-      });
+      const res = await fetch('/api/auction-analysis', { method: 'POST', body: fd });
       if (!res.ok) {
         const j = await res.json();
         throw new Error(j.error ?? 'API 오류');
@@ -52,152 +51,214 @@ export default function AuctionPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">경매 권리분석 — 지지옥션 PDF 업로드</h1>
-        <p className="text-sm text-zinc-600 mt-1">
-          본인 계정으로 다운로드한 지지옥션 매물 상세 PDF를 올리면 Claude가 권리분석·임차인 위험·법령 인용을 자체 재분석합니다. (제3자 공유 금지)
-        </p>
-      </div>
+    <div className="space-y-6 max-w-5xl mx-auto">
+      <SectionHeader
+        title="경매 권리분석"
+        subtitle="지지옥션 매물 PDF → Claude 자체 권리분석 (말소기준·인수권리·임차인 위험·법령 인용)"
+        action={<Badge tone="accent">AI · CORE</Badge>}
+      />
 
       <div
         {...getRootProps()}
-        className={`border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition ${
-          isDragActive ? 'border-blue-500 bg-blue-50' : 'border-zinc-300 bg-white'
+        className={`relative overflow-hidden rounded-3xl p-12 text-center cursor-pointer transition border-2 border-dashed ${
+          isDragActive
+            ? 'border-[color:var(--accent)] bg-[color:var(--accent-soft)]'
+            : 'border-white/15 bg-white/[0.03] hover:bg-white/[0.06]'
         }`}
       >
         <input {...getInputProps()} />
+        <div className="grid place-items-center mb-4">
+          <div className="grid place-items-center size-16 rounded-2xl bg-gradient-to-br from-[color:var(--accent)] to-emerald-400 text-black">
+            <Upload className="size-8" />
+          </div>
+        </div>
         {file ? (
           <div>
-            <p className="font-medium">{file.name}</p>
-            <p className="text-xs text-zinc-500 mt-1">
-              {(file.size / 1024 / 1024).toFixed(2)} MB
-            </p>
+            <div className="flex items-center justify-center gap-2 text-sm">
+              <FileText className="size-4 text-[color:var(--accent)]" />
+              <span className="font-medium">{file.name}</span>
+            </div>
+            <div className="text-xs text-[color:var(--text-muted)] mt-1">
+              {(file.size / 1024 / 1024).toFixed(2)} MB · 다른 파일을 끌어다 놓으면 교체
+            </div>
           </div>
         ) : (
-          <p className="text-zinc-600">
-            여기로 PDF를 끌어다 놓거나 클릭해서 선택 (최대 30MB)
-          </p>
+          <div>
+            <p className="text-base font-medium">
+              {isDragActive ? '여기에 놓으세요' : '지지옥션 PDF 드래그 또는 클릭'}
+            </p>
+            <p className="text-xs text-[color:var(--text-muted)] mt-1">
+              본인 계정으로 다운로드한 매물 자료 · 최대 30MB · 제3자 공유 금지
+            </p>
+          </div>
         )}
       </div>
 
-      <div className="flex items-center gap-3">
-        <select
-          value={model}
-          onChange={(e) => setModel(e.target.value as 'fast' | 'balanced' | 'smart')}
-          className="border rounded px-3 py-2 text-sm"
-        >
-          <option value="fast">Haiku 4.5 (빠름·저렴)</option>
-          <option value="balanced">Sonnet 4.6 (권장)</option>
-          <option value="smart">Opus 4.7 (최고 정확도)</option>
-        </select>
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="flex gap-1 rounded-xl bg-white/5 border border-white/10 p-1">
+          {(['fast', 'balanced', 'smart'] as const).map((m) => (
+            <button
+              key={m}
+              onClick={() => setModel(m)}
+              className={`px-3 py-1.5 text-xs rounded-lg transition ${
+                model === m
+                  ? 'bg-white/10 text-white'
+                  : 'text-[color:var(--text-muted)] hover:text-white'
+              }`}
+            >
+              {m === 'fast' ? 'Haiku 4.5' : m === 'balanced' ? 'Sonnet 4.6' : 'Opus 4.7'}
+            </button>
+          ))}
+        </div>
         <button
           onClick={analyze}
           disabled={!file || loading}
-          className="bg-zinc-900 text-white rounded px-5 py-2 hover:bg-zinc-800 disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-xl bg-[color:var(--accent)] text-black px-5 py-2.5 text-sm font-semibold disabled:opacity-50 accent-glow"
         >
-          {loading ? '분석 중... (30~60초)' : '권리분석 시작'}
+          <Sparkles className="size-4" />
+          {loading ? '분석 중… (30~60초)' : '권리분석 시작'}
         </button>
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 rounded p-3 text-sm">
+        <GlassCard className="border-red-500/30 bg-red-500/5 text-red-300 text-sm">
           {error}
-        </div>
+        </GlassCard>
       )}
 
       {analysis && (
         <div className="space-y-4">
-          <Section title="신뢰도">
-            <div className="text-2xl font-bold">
-              {Math.round(analysis.confidence * 100)}%
-            </div>
-          </Section>
-
-          {analysis.cancellationBase && (
-            <Section title="말소기준권리">
-              <div className="text-sm">
-                <strong>{analysis.cancellationBase.type}</strong> · {analysis.cancellationBase.date}{' '}
-                · {analysis.cancellationBase.holder}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <GlassCard>
+              <div className="text-xs uppercase text-[color:var(--text-muted)]">신뢰도</div>
+              <div className="mt-2 text-3xl font-semibold tabular-nums">
+                {Math.round(analysis.confidence * 100)}
+                <span className="text-sm text-[color:var(--text-muted)]">%</span>
               </div>
-            </Section>
-          )}
+            </GlassCard>
+            {analysis.cancellationBase && (
+              <GlassCard className="md:col-span-2">
+                <div className="text-xs uppercase text-[color:var(--text-muted)]">
+                  말소기준권리
+                </div>
+                <div className="mt-2 text-base">
+                  <span className="font-semibold">{analysis.cancellationBase.type}</span>
+                  <span className="text-[color:var(--text-secondary)] ml-2">
+                    · {analysis.cancellationBase.date} · {analysis.cancellationBase.holder}
+                  </span>
+                </div>
+              </GlassCard>
+            )}
+          </div>
 
           {analysis.survivingRights?.length > 0 && (
-            <Section title="🚨 인수 권리 (낙찰자 부담)">
-              <ul className="text-sm space-y-1">
+            <GlassCard>
+              <SectionHeader
+                title="🚨 인수 권리"
+                subtitle="낙찰자가 추가 부담"
+                action={<Badge tone="danger">{analysis.survivingRights.length}건</Badge>}
+              />
+              <ul className="space-y-2">
                 {analysis.survivingRights.map((r, i) => (
-                  <li key={i} className="border-l-4 border-red-500 pl-3">
-                    <strong>{r.type}</strong> · {r.date} · {r.holder}
-                    {r.amount ? ` · ${formatKRW(r.amount)}` : ''}
+                  <li
+                    key={i}
+                    className="rounded-xl bg-red-500/5 border border-red-500/20 p-3 text-sm"
+                  >
+                    <span className="font-semibold">{r.type}</span>
+                    <span className="text-[color:var(--text-secondary)] ml-2">
+                      {r.date} · {r.holder}
+                    </span>
+                    {r.amount && (
+                      <span className="text-red-300 ml-2">{formatKRW(r.amount)}</span>
+                    )}
                   </li>
                 ))}
               </ul>
-            </Section>
+            </GlassCard>
           )}
 
           {analysis.tenantRisks?.length > 0 && (
-            <Section title="임차인 위험">
-              <ul className="text-sm space-y-2">
+            <GlassCard>
+              <SectionHeader
+                title="임차인 위험"
+                action={<Badge tone="warn">{analysis.tenantRisks.length}건</Badge>}
+              />
+              <ul className="space-y-2">
                 {analysis.tenantRisks.map((t, i) => (
-                  <li key={i} className="bg-amber-50 border border-amber-200 rounded p-3">
-                    <strong>{t.name}</strong> — {t.risk}
-                    {t.estimatedBurden ? (
-                      <span className="block text-xs mt-1">
-                        예상 추가 부담: {formatKRW(t.estimatedBurden)}
-                      </span>
-                    ) : null}
+                  <li
+                    key={i}
+                    className="rounded-xl bg-amber-500/5 border border-amber-500/20 p-3 text-sm"
+                  >
+                    <div className="font-semibold">{t.name}</div>
+                    <div className="text-[color:var(--text-secondary)] mt-1">{t.risk}</div>
+                    {t.estimatedBurden && (
+                      <div className="text-amber-300 text-xs mt-1">
+                        예상 추가 부담 {formatKRW(t.estimatedBurden)}
+                      </div>
+                    )}
                   </li>
                 ))}
               </ul>
-            </Section>
+            </GlassCard>
           )}
 
           {analysis.warnings?.length > 0 && (
-            <Section title="⚠️ 특이사항·경고">
-              <ul className="text-sm space-y-1 list-disc pl-5">
+            <GlassCard>
+              <SectionHeader title="⚠️ 특이사항" />
+              <ul className="space-y-2 text-sm">
                 {analysis.warnings.map((w, i) => (
-                  <li key={i}>{w}</li>
-                ))}
-              </ul>
-            </Section>
-          )}
-
-          {analysis.discrepanciesWithSource?.length > 0 && (
-            <Section title="🔍 지지옥션 분석과의 차이점">
-              <ul className="text-sm space-y-1 list-disc pl-5">
-                {analysis.discrepanciesWithSource.map((d, i) => (
-                  <li key={i}>{d}</li>
-                ))}
-              </ul>
-            </Section>
-          )}
-
-          {analysis.legalCitations?.length > 0 && (
-            <Section title="📖 법령 인용">
-              <ul className="text-sm space-y-2">
-                {analysis.legalCitations.map((c, i) => (
-                  <li key={i} className="bg-zinc-50 rounded p-3">
-                    <strong>
-                      {c.law} {c.article}
-                    </strong>
-                    <div className="text-zinc-600 text-xs mt-1">{c.quote}</div>
+                  <li key={i} className="flex gap-2 items-start">
+                    <AlertTriangle className="size-4 text-amber-400 shrink-0 mt-0.5" />
+                    <span>{w}</span>
                   </li>
                 ))}
               </ul>
-            </Section>
+            </GlassCard>
+          )}
+
+          {analysis.discrepanciesWithSource?.length > 0 && (
+            <GlassCard className="border-[color:var(--accent-soft)]">
+              <SectionHeader
+                title="🔍 지지옥션 분석과의 차이점"
+                subtitle="자체 재분석 결과 불일치 항목"
+                action={<Badge tone="accent">{analysis.discrepanciesWithSource.length}건</Badge>}
+              />
+              <ul className="space-y-2 text-sm">
+                {analysis.discrepanciesWithSource.map((d, i) => (
+                  <li key={i} className="flex gap-2 items-start">
+                    <Eye className="size-4 text-[color:var(--accent)] shrink-0 mt-0.5" />
+                    <span>{d}</span>
+                  </li>
+                ))}
+              </ul>
+            </GlassCard>
+          )}
+
+          {analysis.legalCitations?.length > 0 && (
+            <GlassCard>
+              <SectionHeader title="📖 법령 인용" />
+              <ul className="space-y-2">
+                {analysis.legalCitations.map((c, i) => (
+                  <li
+                    key={i}
+                    className="rounded-xl bg-white/[0.03] border border-white/5 p-3 text-sm"
+                  >
+                    <div className="flex items-center gap-2">
+                      <BookOpen className="size-4 text-[color:var(--accent)]" />
+                      <span className="font-semibold">
+                        {c.law} {c.article}
+                      </span>
+                    </div>
+                    <div className="text-[color:var(--text-secondary)] text-xs mt-1.5 pl-6">
+                      {c.quote}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </GlassCard>
           )}
         </div>
       )}
-    </div>
-  );
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="bg-white border rounded-xl p-5">
-      <h3 className="font-semibold mb-3">{title}</h3>
-      {children}
     </div>
   );
 }

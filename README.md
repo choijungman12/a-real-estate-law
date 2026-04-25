@@ -2,6 +2,16 @@
 
 검증된 공식 OPEN API 11종 + 지지옥션 PDF 권리분석 (Claude Sonnet 4.6) 으로 구성된 부동산 종합 플랫폼.
 
+## 🌐 라이브 미리보기
+
+- **GitHub Pages (UI 미리보기, 정적)**: https://choijungman12.github.io/a-real-estate-law/
+  - 모든 페이지 디자인 확인 가능
+  - 단, API 라우트는 정적 export 시 제외됨 — 실제 데이터 호출은 안 됨
+- **로컬 풀스택 (API 동작)**: `cd app && pnpm dev` → http://localhost:3013
+- **풀스택 운영 배포 권장**: Vercel (Anthropic·data.go.kr·법령 API 모두 작동)
+
+⚙️ GitHub Pages 활성화: Repository Settings → Pages → Source: **GitHub Actions** 선택 (한 번만)
+
 ## 디렉터리 구조
 
 ```
