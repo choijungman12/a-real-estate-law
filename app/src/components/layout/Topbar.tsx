@@ -1,20 +1,17 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Search, Bell, Mic, MicOff } from 'lucide-react';
+import { Search, Bell, Mic, MicOff, Sparkles, Loader2 } from 'lucide-react';
 import { withBase } from '@/lib/utils/href';
 
-// minimal Web Speech API types
 type SpeechRecognitionResult = {
   transcript: string;
   isFinal: boolean;
 };
-
 type SpeechRecognitionEvent = {
   results: { [k: number]: { [k: number]: SpeechRecognitionResult; isFinal: boolean } };
   resultIndex: number;
 };
-
 type SpeechRecognition = {
   lang: string;
   continuous: boolean;
@@ -33,32 +30,22 @@ declare global {
   }
 }
 
-const VOICE_INTENTS: { keywords: string[]; href: string }[] = [
-  { keywords: ['실거래', '시세', '아파트 가격'], href: '/realestate' },
-  { keywords: ['공매', '온비드'], href: '/onbid' },
-  { keywords: ['경매', '권리분석', 'PDF'], href: '/auction' },
-  { keywords: ['청약', '분양'], href: '/applyhome' },
-  { keywords: ['법령', '법률', '재개발', '재건축', '농지', '산지'], href: '/law' },
-  { keywords: ['지도', 'GIS', '매물 보기'], href: '/map' },
-  { keywords: ['뉴스', '기사'], href: '/news' },
-  { keywords: ['계산', '비례율', '분담금', '수익률', '취득세', '종부세'], href: '/calc' },
-  { keywords: ['공부', '스터디', '커리큘럼', '강의'], href: '/study' },
-];
-
-function routeFromTranscript(text: string): string | null {
-  const lower = text.toLowerCase();
-  for (const intent of VOICE_INTENTS) {
-    for (const k of intent.keywords) {
-      if (lower.includes(k.toLowerCase())) return intent.href;
-    }
-  }
-  return null;
-}
+type ParseResult = {
+  intent: string;
+  sigunguName?: string;
+  ym?: string;
+  keyword?: string;
+  reasoning?: string;
+  route: string;
+  error?: string;
+};
 
 export default function Topbar() {
   const [text, setText] = useState('');
   const [listening, setListening] = useState(false);
   const [unsupported, setUnsupported] = useState(false);
+  const [parsing, setParsing] = useState(false);
+  const [result, setResult] = useState<ParseResult | null>(null);
   const recRef = useRef<SpeechRecognition | null>(null);
 
   useEffect(() => {
@@ -77,16 +64,41 @@ export default function Topbar() {
       const trans = last?.[0]?.transcript ?? '';
       setText(trans);
       if (last?.isFinal) {
-        const target = routeFromTranscript(trans);
-        if (target) {
-          window.location.href = withBase(target);
-        }
+        void parseAndRoute(trans);
       }
     };
     rec.onend = () => setListening(false);
     rec.onerror = () => setListening(false);
     recRef.current = rec;
   }, []);
+
+  async function parseAndRoute(query: string) {
+    if (!query.trim()) return;
+    setParsing(true);
+    setResult(null);
+    try {
+      const res = await fetch('/api/voice/parse', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: query }),
+      });
+      const j = (await res.json()) as ParseResult;
+      setResult(j);
+      if (res.ok && j.route) {
+        setTimeout(() => {
+          window.location.href = withBase(j.route);
+        }, 800);
+      }
+    } catch (e) {
+      setResult({
+        intent: 'unknown',
+        route: '/',
+        error: e instanceof Error ? e.message : 'error',
+      });
+    } finally {
+      setParsing(false);
+    }
+  }
 
   function toggle() {
     if (!recRef.current) return;
@@ -95,6 +107,7 @@ export default function Topbar() {
       setListening(false);
     } else {
       setText('');
+      setResult(null);
       try {
         recRef.current.start();
         setListening(true);
@@ -106,8 +119,7 @@ export default function Topbar() {
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    const target = routeFromTranscript(text);
-    if (target) window.location.href = withBase(target);
+    void parseAndRoute(text);
   }
 
   return (
@@ -118,10 +130,14 @@ export default function Topbar() {
           <input
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder={listening ? '듣고 있습니다…' : '주소·법령·키워드·사건번호 — 또는 마이크 클릭'}
+            placeholder={
+              listening
+                ? '듣고 있습니다…'
+                : '예: 강남구 지난달 실거래가 / 재건축 뉴스 / 비례율 계산'
+            }
             className="w-full rounded-xl bg-white/5 border border-white/10 px-9 py-2 text-sm placeholder:text-[color:var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)]/30 focus:border-[color:var(--accent)]/30"
           />
-          {listening && (
+          {(listening || parsing) && (
             <span className="absolute right-3 top-1/2 -translate-y-1/2 size-2 rounded-full bg-red-500 animate-pulse" />
           )}
         </form>
@@ -129,7 +145,7 @@ export default function Topbar() {
           type="button"
           onClick={toggle}
           disabled={unsupported}
-          title={unsupported ? '브라우저 미지원' : '음성 검색 (한국어)'}
+          title={unsupported ? '브라우저 미지원' : '음성 검색 (한국어, AI 인텐트)'}
           className={`hidden md:inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs transition ${
             listening
               ? 'bg-[color:var(--accent)] text-black border-transparent'
@@ -138,8 +154,14 @@ export default function Topbar() {
                 : 'bg-white/5 border-white/10 text-[color:var(--text-secondary)] hover:bg-white/10'
           }`}
         >
-          {listening ? <Mic className="size-4" /> : unsupported ? <MicOff className="size-4" /> : <Mic className="size-4" />}
-          {listening ? '듣는 중…' : '음성'}
+          {listening ? (
+            <Mic className="size-4" />
+          ) : unsupported ? (
+            <MicOff className="size-4" />
+          ) : (
+            <Mic className="size-4" />
+          )}
+          {listening ? '듣는 중…' : 'AI 음성'}
         </button>
         <button className="relative grid place-items-center size-10 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10">
           <Bell className="size-4" />
@@ -149,6 +171,45 @@ export default function Topbar() {
           최
         </div>
       </div>
+
+      {/* AI parse result strip */}
+      {(parsing || result) && (
+        <div className="border-t border-white/5 bg-black/20">
+          <div className="px-5 py-2 flex items-center gap-3 text-xs">
+            {parsing && (
+              <>
+                <Loader2 className="size-3 animate-spin text-[color:var(--accent)]" />
+                <span className="text-[color:var(--text-muted)]">Claude Haiku 4.5 인텐트 분석…</span>
+              </>
+            )}
+            {result && !parsing && (
+              <>
+                <Sparkles className="size-3 text-[color:var(--accent)]" />
+                {result.error ? (
+                  <span className="text-red-300">{result.error}</span>
+                ) : (
+                  <>
+                    <span className="text-[color:var(--text-secondary)]">
+                      <span className="font-semibold text-[color:var(--accent)]">
+                        {result.intent}
+                      </span>
+                      {result.sigunguName && ` · ${result.sigunguName}`}
+                      {result.ym && ` · ${result.ym}`}
+                      {result.keyword && ` · "${result.keyword}"`}
+                    </span>
+                    <span className="text-[color:var(--text-muted)]">→ {result.route}</span>
+                    {result.reasoning && (
+                      <span className="text-[color:var(--text-muted)] ml-auto truncate hidden md:inline">
+                        💡 {result.reasoning}
+                      </span>
+                    )}
+                  </>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </header>
   );
 }

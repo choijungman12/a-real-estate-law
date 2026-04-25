@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { formatKRW, formatArea } from '@/lib/utils/cn';
 import { GlassCard, Badge, SectionHeader } from '@/components/ui/Glass';
 import AutoBanner from '@/components/common/AutoBanner';
@@ -25,14 +26,24 @@ function getSidoOf(code: string) {
   return '11';
 }
 
+function defaultYm() {
+  const d = new Date();
+  d.setMonth(d.getMonth() - 1);
+  return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}`;
+}
+
 export default function RealEstatePage() {
+  const sp = useSearchParams();
   const [type, setType] = useState<'trade' | 'rent'>('trade');
-  const [sigunguCode, setSigunguCode] = useState('11680');
-  const [ym, setYm] = useState(() => {
-    const d = new Date();
-    d.setMonth(d.getMonth() - 1);
-    return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}`;
-  });
+  const [sigunguCode, setSigunguCode] = useState(sp.get('sigunguCode') ?? '11680');
+  const [ym, setYm] = useState(sp.get('ym') ?? defaultYm());
+
+  useEffect(() => {
+    const sg = sp.get('sigunguCode');
+    const y = sp.get('ym');
+    if (sg) setSigunguCode(sg);
+    if (y) setYm(y);
+  }, [sp]);
   const [data, setData] = useState<TradeResp | RentResp | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
