@@ -10,6 +10,9 @@ import {
   ScrollText,
   ArrowUpRight,
   MapPin,
+  Calculator,
+  GraduationCap,
+  Map as MapIcon,
 } from 'lucide-react';
 
 export default function HomePage() {
@@ -129,6 +132,28 @@ export default function HomePage() {
             desc="네이버 뉴스 검색 API · 키워드별 최신 뉴스"
             tag="NAVER"
             icon={<Building2 className="size-5" />}
+          />
+          <ModuleCard
+            href="/map"
+            title="GIS 통합 지도"
+            desc="카카오맵 + V월드 + 클러스터러 + 매물 마커"
+            tag="MAP"
+            icon={<MapIcon className="size-5" />}
+            accent
+          />
+          <ModuleCard
+            href="/calc"
+            title="수지분석 계산기"
+            desc="비례율·분담금·임대수익률·취득세·종부세 즉시 계산"
+            tag="FINANCE"
+            icon={<Calculator className="size-5" />}
+          />
+          <ModuleCard
+            href="/study"
+            title="학습 커리큘럼"
+            desc="L1 기초 → L6 AI 활용 6단계 트랙"
+            tag="STUDY"
+            icon={<GraduationCap className="size-5" />}
           />
         </div>
       </section>

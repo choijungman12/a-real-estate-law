@@ -11,6 +11,8 @@ import {
   KeyRound,
   Settings,
   Map as MapIcon,
+  Calculator,
+  GraduationCap,
 } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import { withBase } from '@/lib/utils/href';
@@ -22,7 +24,9 @@ const NAV = [
   { href: '/onbid', label: '공매 (온비드)', icon: Gavel },
   { href: '/auction', label: '경매 권리분석', icon: Sparkles, accent: true },
   { href: '/applyhome', label: '청약·분양', icon: KeyRound },
+  { href: '/calc', label: '수지분석 계산기', icon: Calculator },
   { href: '/law', label: '법령 (14주제)', icon: ScrollText },
+  { href: '/study', label: '학습 커리큘럼', icon: GraduationCap },
   { href: '/news', label: '뉴스', icon: Newspaper },
 ];
 
