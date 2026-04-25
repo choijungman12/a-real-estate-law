@@ -255,3 +255,76 @@ export function findSigungu(code: string): { sido: string; name: string } | unde
   }
   return undefined;
 }
+
+/**
+ * 주소 문자열 → 시·군·구 코드 (5자리)
+ * 예: "서울특별시 강남구 도곡동 ..." → "11680"
+ *     "경기도 성남시 분당구 ..." → "41135"
+ */
+const SIDO_ALIASES: Record<string, string> = {
+  서울: '서울특별시',
+  부산: '부산광역시',
+  대구: '대구광역시',
+  인천: '인천광역시',
+  광주: '광주광역시',
+  대전: '대전광역시',
+  울산: '울산광역시',
+  세종: '세종특별자치시',
+  경기: '경기도',
+  강원: '강원특별자치도',
+  충북: '충청북도',
+  충남: '충청남도',
+  전북: '전북특별자치도',
+  전남: '전라남도',
+  경북: '경상북도',
+  경남: '경상남도',
+  제주: '제주특별자치도',
+};
+
+export function detectSigunguFromAddress(addr: string): {
+  code: string;
+  sidoName: string;
+  sigunguName: string;
+} | undefined {
+  if (!addr) return undefined;
+  const normalized = addr.replace(/\s+/g, ' ').trim();
+
+  // 시·도 매칭
+  let matchedSido: (typeof SIDO)[number] | undefined;
+  for (const s of SIDO) {
+    if (normalized.includes(s.name)) {
+      matchedSido = s;
+      break;
+    }
+  }
+  if (!matchedSido) {
+    for (const [alias, full] of Object.entries(SIDO_ALIASES)) {
+      if (normalized.startsWith(alias) || normalized.includes(` ${alias} `)) {
+        matchedSido = SIDO.find((s) => s.name === full);
+        if (matchedSido) break;
+      }
+    }
+  }
+  if (!matchedSido) return undefined;
+
+  // 시·군·구 매칭 (구 우선, 그 다음 시/군)
+  // 경기도 성남시 분당구 같이 "시 + 구"는 "성남시 분당구"로 결합 매칭
+  const candidates = matchedSido.sigungu;
+  // 1) 결합형 (예: "수원시 영통구") 우선
+  for (const c of candidates) {
+    if (c.name.includes(' ')) {
+      if (normalized.includes(c.name)) {
+        return { code: c.code, sidoName: matchedSido.name, sigunguName: c.name };
+      }
+    }
+  }
+  // 2) 단일 명 (예: "강남구")
+  for (const c of candidates) {
+    if (!c.name.includes(' ')) {
+      if (normalized.includes(c.name)) {
+        return { code: c.code, sidoName: matchedSido.name, sigunguName: c.name };
+      }
+    }
+  }
+  return undefined;
+}
