@@ -13,6 +13,7 @@ import {
   Map as MapIcon,
   Calculator,
   GraduationCap,
+  Activity,
 } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import { withBase } from '@/lib/utils/href';
@@ -28,6 +29,7 @@ const NAV = [
   { href: '/law', label: '법령 (14주제)', icon: ScrollText },
   { href: '/study', label: '학습 커리큘럼', icon: GraduationCap },
   { href: '/news', label: '뉴스', icon: Newspaper },
+  { href: '/timeline', label: '매물 타임라인', icon: Activity },
 ];
 
 export default function Sidebar() {
