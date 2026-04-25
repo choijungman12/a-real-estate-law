@@ -5,7 +5,7 @@ import { GlassCard, Badge, SectionHeader } from '@/components/ui/Glass';
 import AutoBanner from '@/components/common/AutoBanner';
 import { formatKRW } from '@/lib/utils/cn';
 import type { OnbidItem } from '@/lib/api/onbid';
-import { Clock, Activity, Loader2 } from 'lucide-react';
+import { Clock, Activity, Loader2, TrendingUp, Database } from 'lucide-react';
 
 const SIDO = [
   '서울', '부산', '대구', '인천', '광주', '대전', '울산',
@@ -156,12 +156,137 @@ export default function TimelinePage() {
         </GlassCard>
       </div>
 
-      <GlassCard>
+      <SeriesChart />
+    </div>
+  );
+}
+
+function SeriesChart() {
+  const [data, setData] = useState<{
+    series: { date: string; count: number }[];
+    sidoBreakdown: { sido: string; count: number }[];
+    error?: string;
+    hint?: string;
+  } | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch('/api/timeline/series?days=30');
+        const j = await res.json();
+        setData({
+          series: j.series ?? [],
+          sidoBreakdown: j.sidoBreakdown ?? [],
+          error: j.error,
+          hint: j.hint,
+        });
+      } catch (e) {
+        setData({
+          series: [],
+          sidoBreakdown: [],
+          error: e instanceof Error ? e.message : 'error',
+        });
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  return (
+    <GlassCard>
+      <div className="flex items-center gap-2 mb-3">
+        <Database className="size-4 text-[color:var(--accent)]" />
+        <h3 className="font-semibold text-sm">DB 누적 시계열 (최근 30일)</h3>
+        <Badge tone="neutral">SUPABASE</Badge>
+      </div>
+      {loading && (
         <div className="text-xs text-[color:var(--text-muted)]">
-          💡 정식 타임라인(일별 누적·소진 추이)은 자체 DB(Supabase 등)에 매물 스냅샷을 저장한 후
-          시계열 차트로 시각화합니다. 현재는 온비드 OPEN API의 현재 시점 스냅샷을 시·도별 집계 + 최근 등록 순으로 표시합니다.
+          <Loader2 className="size-3 inline animate-spin mr-1" />
+          시계열 조회 중…
         </div>
-      </GlassCard>
+      )}
+      {data?.error && (
+        <div className="rounded-xl bg-amber-500/5 border border-amber-500/20 p-4 text-xs text-amber-300">
+          <div className="font-semibold mb-1">DB 미설정 또는 데이터 없음</div>
+          <div className="text-[color:var(--text-secondary)]">{data.error}</div>
+          {data.hint && (
+            <div className="text-[color:var(--text-muted)] mt-2">{data.hint}</div>
+          )}
+          <div className="mt-3 text-[10px] text-[color:var(--text-muted)]">
+            셋업:
+            <br />1. Supabase 가입 → 프로젝트 생성 → DATABASE_URL 복사
+            <br />2. <code>.env.local</code>의 <code>DATABASE_URL=</code>에 입력
+            <br />3. <code>pnpm exec drizzle-kit push</code>로 스키마 마이그레이션
+            <br />4. <code>/api/cron/snapshot/onbid</code> 일 1회 호출 (Vercel cron 자동)
+          </div>
+        </div>
+      )}
+      {data && data.series.length > 0 && (
+        <>
+          <Sparkline points={data.series} />
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-2 mt-4">
+            {data.sidoBreakdown.slice(0, 10).map((s) => (
+              <div
+                key={s.sido}
+                className="rounded-lg bg-white/[0.04] border border-white/5 p-2 text-center"
+              >
+                <div className="text-[10px] text-[color:var(--text-muted)]">{s.sido}</div>
+                <div className="text-sm font-semibold text-[color:var(--accent)] tabular-nums mt-1">
+                  {s.count}
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </GlassCard>
+  );
+}
+
+function Sparkline({ points }: { points: { date: string; count: number }[] }) {
+  const W = 720;
+  const H = 160;
+  const PAD = 24;
+  const max = Math.max(1, ...points.map((p) => p.count));
+  const stepX = points.length > 1 ? (W - PAD * 2) / (points.length - 1) : 0;
+  const path = points
+    .map((p, i) => {
+      const x = PAD + i * stepX;
+      const y = H - PAD - (p.count / max) * (H - PAD * 2);
+      return `${i === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`;
+    })
+    .join(' ');
+
+  return (
+    <div className="w-full overflow-x-auto">
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full">
+        <defs>
+          <linearGradient id="spark" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="rgba(182,255,74,0.4)" />
+            <stop offset="100%" stopColor="rgba(182,255,74,0)" />
+          </linearGradient>
+        </defs>
+        <path
+          d={`${path} L ${PAD + (points.length - 1) * stepX} ${H - PAD} L ${PAD} ${H - PAD} Z`}
+          fill="url(#spark)"
+        />
+        <path d={path} stroke="#b6ff4a" strokeWidth="2" fill="none" />
+        {points.map((p, i) => {
+          const x = PAD + i * stepX;
+          const y = H - PAD - (p.count / max) * (H - PAD * 2);
+          return <circle key={i} cx={x} cy={y} r="2.5" fill="#b6ff4a" />;
+        })}
+        <text x={PAD} y={H - 4} fontSize="10" fill="rgba(255,255,255,0.45)">
+          {points[0]?.date}
+        </text>
+        <text x={W - PAD} y={H - 4} fontSize="10" fill="rgba(255,255,255,0.45)" textAnchor="end">
+          {points[points.length - 1]?.date}
+        </text>
+        <text x={W - PAD} y={14} fontSize="11" fill="#b6ff4a" textAnchor="end" fontWeight="600">
+          최대 {max}건/일
+        </text>
+      </svg>
     </div>
   );
 }
