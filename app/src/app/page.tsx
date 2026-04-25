@@ -1,5 +1,6 @@
 import { GlassCard, StatCard, Badge, SectionHeader } from '@/components/ui/Glass';
 import { withBase } from '@/lib/utils/href';
+import Skyline from '@/components/hero/Skyline';
 import {
   Sparkles,
   TrendingUp,
@@ -15,9 +16,10 @@ export default function HomePage() {
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-3xl glass-strong p-8 md:p-10">
+      <section className="relative overflow-hidden rounded-3xl glass-strong p-8 md:p-10 min-h-[420px]">
         <div className="absolute -top-20 -right-20 size-72 rounded-full bg-[color:var(--accent)]/20 blur-3xl pointer-events-none" />
         <div className="absolute -bottom-32 -left-10 size-72 rounded-full bg-violet-500/15 blur-3xl pointer-events-none" />
+        <Skyline className="absolute inset-x-0 bottom-0 w-full opacity-80 pointer-events-none" />
 
         <div className="relative">
           <Badge tone="accent">REAL ESTATE × AI</Badge>

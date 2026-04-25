@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { formatKRW } from '@/lib/utils/cn';
 import { GlassCard, Badge, SectionHeader } from '@/components/ui/Glass';
+import AutoBanner from '@/components/common/AutoBanner';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { OnbidItem } from '@/lib/api/onbid';
 
@@ -43,6 +44,8 @@ export default function OnbidPage() {
         subtitle="한국자산관리공사 KAMCO 캠코공매물건 OPEN API"
         action={<Badge tone="accent">KAMCO</Badge>}
       />
+
+      <AutoBanner required={['data_go_kr']} />
 
       {error && (
         <GlassCard className="border-red-500/30 bg-red-500/5 text-red-300 text-sm">

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { GlassCard, Badge, SectionHeader } from '@/components/ui/Glass';
+import AutoBanner from '@/components/common/AutoBanner';
 import { Search, ExternalLink } from 'lucide-react';
 
 type NewsItem = {
@@ -48,6 +49,8 @@ export default function NewsPage() {
         subtitle="네이버 검색 API · 일 25,000회 한도"
         action={<Badge tone="accent">NAVER</Badge>}
       />
+
+      <AutoBanner required={['naver']} />
 
       <GlassCard className="p-3">
         <div className="flex gap-2">

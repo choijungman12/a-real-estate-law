@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { GlassCard, Badge, SectionHeader } from '@/components/ui/Glass';
+import AutoBanner from '@/components/common/AutoBanner';
 import { KeyRound, Building2 } from 'lucide-react';
 
 type Item = {
@@ -45,6 +46,8 @@ export default function ApplyhomePage() {
         subtitle="청약홈 분양정보 OPEN API · 한국부동산원"
         action={<Badge tone="accent">REB</Badge>}
       />
+
+      <AutoBanner required={['data_go_kr']} />
 
       {error && (
         <GlassCard className="border-red-500/30 bg-red-500/5 text-red-300 text-sm">

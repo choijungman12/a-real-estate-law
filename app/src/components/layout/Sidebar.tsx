@@ -5,18 +5,19 @@ import {
   Home,
   Building2,
   Gavel,
-  FileSearch,
   ScrollText,
   Newspaper,
   Sparkles,
   KeyRound,
   Settings,
+  Map as MapIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import { withBase } from '@/lib/utils/href';
 
 const NAV = [
   { href: '/', label: '대시보드', icon: Home },
+  { href: '/map', label: 'GIS 지도', icon: MapIcon, accent: true },
   { href: '/realestate', label: '실거래가', icon: Building2 },
   { href: '/onbid', label: '공매 (온비드)', icon: Gavel },
   { href: '/auction', label: '경매 권리분석', icon: Sparkles, accent: true },

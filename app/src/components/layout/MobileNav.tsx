@@ -1,16 +1,16 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { Home, Building2, Gavel, Sparkles, ScrollText } from 'lucide-react';
+import { Home, Building2, Gavel, Sparkles, Map as MapIcon } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import { withBase } from '@/lib/utils/href';
 
 const NAV = [
   { href: '/', label: '홈', icon: Home },
-  { href: '/realestate', label: '시세', icon: Building2 },
+  { href: '/map', label: '지도', icon: MapIcon },
   { href: '/auction', label: 'AI', icon: Sparkles },
+  { href: '/realestate', label: '시세', icon: Building2 },
   { href: '/onbid', label: '공매', icon: Gavel },
-  { href: '/law', label: '법령', icon: ScrollText },
 ];
 
 export default function MobileNav() {

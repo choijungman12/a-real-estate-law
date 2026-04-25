@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { formatKRW, formatArea } from '@/lib/utils/cn';
 import { GlassCard, Badge, SectionHeader } from '@/components/ui/Glass';
+import AutoBanner from '@/components/common/AutoBanner';
 import type { AptTradeRecord, AptRentRecord } from '@/types/realestate';
 import { Search, TrendingUp } from 'lucide-react';
 
@@ -58,6 +59,8 @@ export default function RealEstatePage() {
         subtitle="국토교통부 실거래가 OPEN API · 시군구코드 + 계약 연월"
         action={<Badge tone="accent">MOLIT</Badge>}
       />
+
+      <AutoBanner required={['data_go_kr']} />
 
       <GlassCard>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3">

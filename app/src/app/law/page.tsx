@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import type { LawSummary } from '@/lib/api/law';
 import type { LawCategory } from '@/lib/law/catalog';
 import { GlassCard, Badge, SectionHeader } from '@/components/ui/Glass';
+import { CategoryDiagram } from '@/components/diagrams';
 import { Search, ScrollText, Sparkles } from 'lucide-react';
 
 type CatItem = { category: LawCategory; title: string; description: string; count: number };
@@ -143,6 +144,10 @@ export default function LawPage() {
                     {categoryData.description}
                   </p>
                 </div>
+
+                {/* 초보자용 시각화 (해당 카테고리만) */}
+                <CategoryDiagram category={categoryData.category} />
+
                 {categoryData.results.map((r) => (
                   <div key={r.query} className="space-y-2">
                     <div className="font-medium text-sm flex items-center gap-2">

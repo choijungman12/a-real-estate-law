@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { formatKRW } from '@/lib/utils/cn';
 import { GlassCard, Badge, SectionHeader } from '@/components/ui/Glass';
+import AutoBanner from '@/components/common/AutoBanner';
 import type { AuctionAnalysis } from '@/types/auction';
 import { Upload, Sparkles, AlertTriangle, FileText, BookOpen, Eye } from 'lucide-react';
 
@@ -58,6 +59,8 @@ export default function AuctionPage() {
         action={<Badge tone="accent">AI · CORE</Badge>}
       />
 
+      <AutoBanner required={['anthropic']} />
+
       <div
         {...getRootProps()}
         className={`relative overflow-hidden rounded-3xl p-12 text-center cursor-pointer transition border-2 border-dashed ${
@@ -84,11 +87,11 @@ export default function AuctionPage() {
           </div>
         ) : (
           <div>
-            <p className="text-base font-medium">
-              {isDragActive ? '여기에 놓으세요' : '지지옥션 PDF 드래그 또는 클릭'}
+            <p className="text-base font-medium tracking-wider">
+              {isDragActive ? '여기에 놓으세요' : 'REAL ESTATE 드래그 또는 클릭'}
             </p>
             <p className="text-xs text-[color:var(--text-muted)] mt-1">
-              본인 계정으로 다운로드한 매물 자료 · 최대 30MB · 제3자 공유 금지
+              본인 계정으로 다운로드한 경매·공매 매물 PDF · 최대 30MB · 제3자 공유 금지
             </p>
           </div>
         )}
