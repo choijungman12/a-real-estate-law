@@ -135,7 +135,8 @@ export default function Topbar() {
                 ? '듣고 있습니다…'
                 : '예: 강남구 지난달 실거래가 / 재건축 뉴스 / 비례율 계산'
             }
-            className="w-full rounded-xl bg-white/5 border border-white/10 px-9 py-2 text-sm placeholder:text-[color:var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)]/30 focus:border-[color:var(--accent)]/30"
+            className="w-full rounded-xl bg-white/5 border border-white/10 px-9 py-2 text-sm placeholder:text-[color:var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)]/50 focus:border-[color:var(--accent)]/50"
+            aria-label="검색 (음성·텍스트, AI 인텐트 자동 라우팅)"
           />
           {(listening || parsing) && (
             <span className="absolute right-3 top-1/2 -translate-y-1/2 size-2 rounded-full bg-red-500 animate-pulse" />

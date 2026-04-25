@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { formatKRW, formatArea } from '@/lib/utils/cn';
 import { GlassCard, Badge, SectionHeader } from '@/components/ui/Glass';
@@ -33,6 +33,14 @@ function defaultYm() {
 }
 
 export default function RealEstatePage() {
+  return (
+    <Suspense fallback={<div className="text-sm text-[color:var(--text-muted)]">로드 중…</div>}>
+      <RealEstateContent />
+    </Suspense>
+  );
+}
+
+function RealEstateContent() {
   const sp = useSearchParams();
   const [type, setType] = useState<'trade' | 'rent'>('trade');
   const [sigunguCode, setSigunguCode] = useState(sp.get('sigunguCode') ?? '11680');

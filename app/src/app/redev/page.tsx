@@ -96,7 +96,7 @@ function OverviewTab() {
         <StatCard
           label="입안 동의율"
           value={`${consentRate.toFixed(1)}%`}
-          hint="목표 50% (추진위 §35)"
+          hint="목표 50% (도정법 §8 + 서울조례 §6)"
           delta={{ value: consentRate >= 50 ? '✓ 달성' : '진행 중', positive: consentRate >= 50 }}
         />
       </div>

@@ -63,7 +63,8 @@ export type AcquisitionTaxInput = {
 };
 
 export function computeAcquisitionTax(i: AcquisitionTaxInput) {
-  // 단순화 — 6억 이하 1%, 9억 이하 1~3%, 9억 초과 3% (1주택 기준)
+  // ⚠️ 단순 추정 — 정확한 산정은 「지방세법」 별표 + 시·도 조례 확인.
+  // 1주택 6~9억 구간은 실제 단계 누진(공시가격·전용면적별 세분화)이지만, 여기서는 선형 보간으로 근사.
   let ratePct: number;
   if (i.numHomes === 1) {
     if (i.price <= 6e8) ratePct = 1;
@@ -75,7 +76,7 @@ export function computeAcquisitionTax(i: AcquisitionTaxInput) {
     ratePct = i.isAdjustedArea ? 12 : 8;
   }
   const tax = i.price * (ratePct / 100);
-  // 농어촌특별세·지방교육세 추가 ~10%
+  // 농어촌특별세 + 지방교육세 합산 ~10% 추정 (전용면적·세율별 차등 미반영)
   const surtax = tax * 0.1;
   return { ratePct, tax, surtax, total: tax + surtax };
 }
@@ -88,9 +89,12 @@ export type ComprehensiveTaxInput = {
 };
 
 export function computeComprehensiveTax(i: ComprehensiveTaxInput) {
+  // ⚠️ 단순 추정 — 「종부세법」 제8~9조 단계 누진(0.5~5%)을 평균값으로 근사.
+  // 실제는 공정시장가액비율(60% 등) + 세부담상한 + 누진세율표 정밀 적용 필요.
+  // 1주택자 12억(2024 개정), 다주택자 9억 기본공제 — 공시가격 합계 기준.
   const baseExemption = i.numHomes === 1 ? 12e8 : 9e8;
   const taxableBase = Math.max(0, i.publicAssessedValue - baseExemption);
-  // 1주택 0.5~2.7%, 다주택 0.5~5% — 단순 누진 평균값으로 근사
+  // 1주택 평균 1.2%, 다주택 평균 2.5% (구간별 0.5~5% 누진의 중앙값 근사)
   const rate = i.numHomes === 1 ? 0.012 : 0.025;
   return {
     taxableBase,

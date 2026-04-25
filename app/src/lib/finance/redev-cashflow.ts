@@ -115,9 +115,12 @@ export function computeRedevCashflow(i: RedevCashflowInput): RedevCashflowResult
     totalFloorPyeong * i.constructionUnitCostMan * 10_000;
   const undergroundConst =
     basementFloorPyeong * i.constructionUnitCostMan * 10_000;
-  const inletCost = totalFloorPyeong * 50 * 10_000; // 평당 5만원 가정 (PDF)
-  const artInstall = totalFloorPyeong * 7868 * 0.001; // 0.1% 추정 (PDF)
-  const construction = aboveGroundConst + undergroundConst + inletCost + artInstall;
+  const inletCost = totalFloorPyeong * 50 * 10_000; // 인입 평당 5만원 (PDF)
+  // 예술장식품: PDF "지상 연면적 × @7,868 × 0.1%" 표기 — 지상 직접공사비의 0.1% 수준
+  const artInstall = aboveGroundConst * 0.001;
+  // 지장물 이설·철거 (PDF 22억 수준) — 지상 평당 0.4만원 단순 추정
+  const demolition = totalFloorPyeong * 4 * 10_000;
+  const construction = aboveGroundConst + undergroundConst + inletCost + artInstall + demolition;
 
   // 2. 보상비 — 현금청산만 단순 추정 (미동의자 5%)
   const cashClearing = i.preAssetTotal * 0.05;
@@ -138,8 +141,10 @@ export function computeRedevCashflow(i: RedevCashflowInput): RedevCashflowResult
   // 5. 등기비용
   const registrationFee = (construction + officeServices) * 0.036;
 
-  // 6. 운영비
-  const opCost = 960_000_000;
+  // 6. 운영비 (조합 운영·총회) — 지출의 ~0.05% 규모로 동적 계산
+  // PDF 1,302세대 사업에서 9.6억 ≈ 총지출 1.07조의 0.09%
+  const opCostBase = i.totalUnits * 700_000; // 세대당 70만원 (운영·총회비 추정)
+  const opCost = Math.max(opCostBase, 500_000_000);
 
   // 7. 부담금
   const transportFee = (totalFloorPyeong - basementFloorPyeong) * 7868 * 0.04 * 0.5;

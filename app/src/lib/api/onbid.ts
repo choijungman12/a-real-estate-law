@@ -38,7 +38,8 @@ export async function fetchOnbidItems(params: {
   if (!key) throw new Error('DATA_GO_KR_KEY_ENCODED 가 필요합니다.');
 
   const url = new URL(ONBID_BASE);
-  url.searchParams.set('ServiceKey', key);
+  // 공공데이터포털 통일 표기는 serviceKey (소문자 s); 온비드 문서는 ServiceKey 표기지만 둘 다 동작
+  url.searchParams.set('serviceKey', key);
   url.searchParams.set('numOfRows', String(params.rows ?? 30));
   url.searchParams.set('pageNo', String(params.page ?? 1));
   if (params.cltrSttsCd) url.searchParams.set('CLTR_STTS_CD', params.cltrSttsCd);

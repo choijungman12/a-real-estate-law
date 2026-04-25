@@ -32,6 +32,16 @@ export default function PropertyDetailModal({
   const [error, setError] = useState<string | null>(null);
   const [resolved, setResolved] = useState<{ sido: string; name: string; code: string } | null>(null);
 
+  // ESC 키로 닫기
+  useEffect(() => {
+    if (!item) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [item, onClose]);
+
   useEffect(() => {
     if (!item) {
       setTrades([]);

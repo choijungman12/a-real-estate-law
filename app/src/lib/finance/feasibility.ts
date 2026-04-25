@@ -24,6 +24,8 @@ export function calculateFeasibility(input: FeasibilityInput): FeasibilityResult
   const memberCount = input.memberCount > 0 ? input.memberCount : 1;
   const avgBeforeAsset = input.totalBefore / memberCount;
   const avgSalePrice = input.expectedSalePrice * input.avgUnitArea;
+  // 평균 분담금 = 조합원 분양가 − 권리가액(종전자산 × 비례율/100)
+  // 양수 = 추가 부담금, 음수 = 환급금 (도시정비법 §33 표준 산정)
   const averageAdditionalCost = avgSalePrice - (avgBeforeAsset * proportionalRate) / 100;
 
   const requiredRevenue = totalCost + input.totalBefore - rentalIncome;
