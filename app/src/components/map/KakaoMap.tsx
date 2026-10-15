@@ -80,15 +80,16 @@ export default function KakaoMap({
   const mapRef = useRef<KakaoMap | null>(null);
   const clustererRef = useRef<KakaoClusterer | null>(null);
   const cadastralOverlayRef = useRef<unknown>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [sdkError, setSdkError] = useState<string | null>(null);
+  // 키는 빌드 때 정해지는 값이라 state가 아니라 바로 계산한다
+  const error = process.env.NEXT_PUBLIC_KAKAO_JS_KEY
+    ? sdkError
+    : 'NEXT_PUBLIC_KAKAO_JS_KEY 가 .env.local 에 없습니다.';
 
   // init map once
   useEffect(() => {
     const jsKey = process.env.NEXT_PUBLIC_KAKAO_JS_KEY;
-    if (!jsKey) {
-      setError('NEXT_PUBLIC_KAKAO_JS_KEY 가 .env.local 에 없습니다.');
-      return;
-    }
+    if (!jsKey) return;
     const SCRIPT_ID = 'kakao-map-sdk';
     const init = () => {
       if (!window.kakao || !containerRef.current) return;
@@ -148,7 +149,7 @@ export default function KakaoMap({
     s.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${jsKey}&autoload=false&libraries=services,clusterer,drawing`;
     s.async = true;
     s.onload = init;
-    s.onerror = () => setError('카카오맵 SDK 로드 실패. 도메인 등록 확인.');
+    s.onerror = () => setSdkError('카카오맵 SDK 로드 실패. 도메인 등록 확인.');
     document.head.appendChild(s);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

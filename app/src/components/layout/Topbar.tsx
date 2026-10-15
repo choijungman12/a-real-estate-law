@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { Search, Bell, Mic, MicOff, Sparkles, Loader2 } from 'lucide-react';
 import { withBase } from '@/lib/utils/href';
 
@@ -40,20 +40,24 @@ type ParseResult = {
   error?: string;
 };
 
+const noopSubscribe = () => () => {};
+
 export default function Topbar() {
   const [text, setText] = useState('');
   const [listening, setListening] = useState(false);
-  const [unsupported, setUnsupported] = useState(false);
+  // 서버 렌더 · 하이드레이션에서는 false, 브라우저에서 실제 지원 여부로 바뀐다
+  const unsupported = useSyncExternalStore(
+    noopSubscribe,
+    () => !(window.SpeechRecognition || window.webkitSpeechRecognition),
+    () => false
+  );
   const [parsing, setParsing] = useState(false);
   const [result, setResult] = useState<ParseResult | null>(null);
   const recRef = useRef<SpeechRecognition | null>(null);
 
   useEffect(() => {
     const Ctor = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!Ctor) {
-      setUnsupported(true);
-      return;
-    }
+    if (!Ctor) return;
     const rec = new Ctor();
     rec.lang = 'ko-KR';
     rec.continuous = false;

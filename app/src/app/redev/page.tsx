@@ -389,7 +389,7 @@ function ConsentTab() {
             <li>전자서명 완료 인장</li>
           </ul>
           <p className="text-xs text-[color:var(--text-muted)]">
-            발급 후 새 탭에서 인쇄 미리보기 → "PDF로 저장"으로 보관하세요.
+            발급 후 새 탭에서 인쇄 미리보기 → &quot;PDF로 저장&quot;으로 보관하세요.
           </p>
         </div>
       </GlassCard>

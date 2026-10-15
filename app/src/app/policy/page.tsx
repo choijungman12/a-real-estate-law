@@ -16,33 +16,49 @@ type PolicyItem = {
 
 const QUICK = ['부동산', '주택공급', '재건축', '청약', '대출', 'LH', '도시개발'];
 
+const INITIAL_QUERY = '부동산';
+
+async function fetchPolicy(q: string): Promise<{ items: PolicyItem[]; total: number }> {
+  const res = await fetch(`/api/policy?q=${encodeURIComponent(q)}&rows=30`);
+  if (!res.ok) throw new Error((await res.json()).error ?? 'API 오류');
+  const j = await res.json();
+  return { items: j.items ?? [], total: j.totalCount ?? 0 };
+}
+
+const errorMessage = (e: unknown) => (e instanceof Error ? e.message : '오류');
+
 export default function PolicyPage() {
-  const [query, setQuery] = useState('부동산');
+  const [query, setQuery] = useState(INITIAL_QUERY);
   const [items, setItems] = useState<PolicyItem[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [total, setTotal] = useState(0);
 
-  async function load(q?: string) {
-    const target = q ?? query;
+  function load(q?: string) {
     setLoading(true);
     setError(null);
-    try {
-      const res = await fetch(`/api/policy?q=${encodeURIComponent(target)}&rows=30`);
-      if (!res.ok) throw new Error((await res.json()).error ?? 'API 오류');
-      const j = await res.json();
-      setItems(j.items ?? []);
-      setTotal(j.totalCount ?? 0);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : '오류');
-    } finally {
-      setLoading(false);
-    }
+    fetchPolicy(q ?? query)
+      .then(
+        (r) => {
+          setItems(r.items);
+          setTotal(r.total);
+        },
+        (e) => setError(errorMessage(e))
+      )
+      .finally(() => setLoading(false));
   }
 
+  // 첫 조회: loading은 true로 시작하고, state는 응답 콜백에서만 바꾼다
   useEffect(() => {
-    load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    fetchPolicy(INITIAL_QUERY)
+      .then(
+        (r) => {
+          setItems(r.items);
+          setTotal(r.total);
+        },
+        (e) => setError(errorMessage(e))
+      )
+      .finally(() => setLoading(false));
   }, []);
 
   return (
