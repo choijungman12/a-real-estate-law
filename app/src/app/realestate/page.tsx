@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { formatKRW, formatArea } from '@/lib/utils/cn';
 import { GlassCard, Badge, SectionHeader } from '@/components/ui/Glass';
@@ -46,12 +46,15 @@ function RealEstateContent() {
   const [sigunguCode, setSigunguCode] = useState(sp.get('sigunguCode') ?? '11680');
   const [ym, setYm] = useState(sp.get('ym') ?? defaultYm());
 
-  useEffect(() => {
+  // URL 파라미터가 바뀌면 렌더 중에 입력값을 맞춘다 (effect 안 setState 대신)
+  const [prevSp, setPrevSp] = useState(sp);
+  if (sp !== prevSp) {
+    setPrevSp(sp);
     const sg = sp.get('sigunguCode');
     const y = sp.get('ym');
     if (sg) setSigunguCode(sg);
     if (y) setYm(y);
-  }, [sp]);
+  }
   const [data, setData] = useState<TradeResp | RentResp | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

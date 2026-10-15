@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { GlassCard, Badge } from '@/components/ui/Glass';
 import { formatKRW } from '@/lib/utils/cn';
 import { detectSigunguFromAddress } from '@/lib/geo/sigungu';
@@ -27,10 +27,31 @@ export default function PropertyDetailModal({
   item: DetailItem | null;
   onClose: () => void;
 }) {
+  const detected = useMemo(
+    () => (item ? detectSigunguFromAddress(item.address) : null),
+    [item]
+  );
+  const resolved = detected
+    ? { sido: detected.sidoName, name: detected.sigunguName, code: detected.code }
+    : null;
+  const detectError =
+    item && !detected
+      ? '주소에서 시·군·구를 식별할 수 없어 인근 실거래가를 자동 조회할 수 없습니다.'
+      : null;
+
   const [trades, setTrades] = useState<AptTradeRecord[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [resolved, setResolved] = useState<{ sido: string; name: string; code: string } | null>(null);
+  const [loading, setLoading] = useState(Boolean(detected));
+  const [fetchError, setFetchError] = useState<string | null>(null);
+  const error = detectError ?? fetchError;
+
+  // 매물이 바뀌면 이전 조회 결과를 렌더 중에 초기화 (effect 안 setState 대신)
+  const [prevItem, setPrevItem] = useState(item);
+  if (item !== prevItem) {
+    setPrevItem(item);
+    setTrades([]);
+    setFetchError(null);
+    setLoading(Boolean(detected));
+  }
 
   // ESC 키로 닫기
   useEffect(() => {
@@ -43,23 +64,10 @@ export default function PropertyDetailModal({
   }, [item, onClose]);
 
   useEffect(() => {
-    if (!item) {
-      setTrades([]);
-      setError(null);
-      setResolved(null);
-      return;
-    }
-    const detected = detectSigunguFromAddress(item.address);
-    if (!detected) {
-      setError('주소에서 시·군·구를 식별할 수 없어 인근 실거래가를 자동 조회할 수 없습니다.');
-      return;
-    }
-    setResolved({ sido: detected.sidoName, name: detected.sigunguName, code: detected.code });
+    if (!detected) return;
 
     // 최근 3개월 합산
     (async () => {
-      setLoading(true);
-      setError(null);
       const all: AptTradeRecord[] = [];
       const now = new Date();
       for (let m = 1; m <= 3; m++) {
@@ -79,14 +87,14 @@ export default function PropertyDetailModal({
       setTrades(all);
       setLoading(false);
       if (all.length === 0) {
-        setError('해당 시·군·구의 최근 실거래 데이터를 찾지 못했습니다 (키 미설정 또는 데이터 부재).');
+        setFetchError('해당 시·군·구의 최근 실거래 데이터를 찾지 못했습니다 (키 미설정 또는 데이터 부재).');
       }
     })();
-  }, [item]);
+  }, [detected]);
 
   if (!item) return null;
 
-  const median = useMedian(trades.map((t) => t.dealAmount));
+  const median = medianOf(trades.map((t) => t.dealAmount));
   const min = trades.length > 0 ? Math.min(...trades.map((t) => t.dealAmount)) : 0;
   const max = trades.length > 0 ? Math.max(...trades.map((t) => t.dealAmount)) : 0;
   const discountVsMedian =
@@ -226,7 +234,7 @@ export default function PropertyDetailModal({
   );
 }
 
-function useMedian(values: number[]): number {
+function medianOf(values: number[]): number {
   if (values.length === 0) return 0;
   const sorted = [...values].sort((a, b) => a - b);
   const mid = Math.floor(sorted.length / 2);

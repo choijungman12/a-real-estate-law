@@ -15,31 +15,36 @@ type NewsItem = {
 
 const QUICK = ['부동산', '재건축', '청약', 'LH', '금리', '경매', '아파트', '도시개발'];
 
+const INITIAL_QUERY = '부동산';
+
+async function fetchNews(q: string): Promise<NewsItem[]> {
+  const res = await fetch(`/api/news?q=${encodeURIComponent(q)}&display=50`);
+  if (!res.ok) throw new Error((await res.json()).error ?? 'API 오류');
+  const j = await res.json();
+  return j.items;
+}
+
+const errorMessage = (e: unknown) => (e instanceof Error ? e.message : '오류');
+
 export default function NewsPage() {
-  const [query, setQuery] = useState('부동산');
+  const [query, setQuery] = useState(INITIAL_QUERY);
   const [items, setItems] = useState<NewsItem[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  async function load(q?: string) {
-    const target = q ?? query;
+  function load(q?: string) {
     setLoading(true);
     setError(null);
-    try {
-      const res = await fetch(`/api/news?q=${encodeURIComponent(target)}&display=50`);
-      if (!res.ok) throw new Error((await res.json()).error ?? 'API 오류');
-      const j = await res.json();
-      setItems(j.items);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : '오류');
-    } finally {
-      setLoading(false);
-    }
+    fetchNews(q ?? query)
+      .then(setItems, (e) => setError(errorMessage(e)))
+      .finally(() => setLoading(false));
   }
 
+  // 첫 조회: loading은 true로 시작하고, state는 응답 콜백에서만 바꾼다
   useEffect(() => {
-    load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    fetchNews(INITIAL_QUERY)
+      .then(setItems, (e) => setError(errorMessage(e)))
+      .finally(() => setLoading(false));
   }, []);
 
   return (

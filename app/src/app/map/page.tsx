@@ -54,11 +54,7 @@ export default function MapPage() {
   }, [indexed, filterText]);
 
   useEffect(() => {
-    if (!layers.onbid) {
-      setIndexed([]);
-      setItems([]);
-      return;
-    }
+    if (!layers.onbid) return;
     let cancelled = false;
     (async () => {
       setLoading(true);
@@ -148,7 +144,14 @@ export default function MapPage() {
                 label="공매 매물 (온비드)"
                 color="#b6ff4a"
                 active={layers.onbid}
-                onChange={(v) => setLayers((s) => ({ ...s, onbid: v }))}
+                onChange={(v) => {
+                  // 레이어를 끌 때 마커 · 목록 비우기 (effect 대신 이벤트에서)
+                  if (!v) {
+                    setIndexed([]);
+                    setItems([]);
+                  }
+                  setLayers((s) => ({ ...s, onbid: v }));
+                }}
                 count={items.length || undefined}
               />
               <LayerToggle
